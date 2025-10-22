@@ -13,7 +13,7 @@
     class: className,
     weekdayFormat = "short",
     buttonVariant = "ghost",
-    captionLayout = "label",
+    captionLayout = "dropdown",
     locale = "en-US",
     months: monthsProp,
     years,
@@ -21,6 +21,7 @@
     yearFormat = "numeric",
     day,
     disableDaysOutsideMonth = false,
+
     ...restProps
   }: WithoutChildrenOrChild<CalendarPrimitive.RootProps> & {
     buttonVariant?: ButtonVariant;

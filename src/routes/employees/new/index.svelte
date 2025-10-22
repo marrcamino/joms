@@ -2,33 +2,39 @@
   import RouteContent from "$lib/components/route-content.svelte";
   import Button from "$lib/components/ui/button/button.svelte";
   import { ChevronLeft } from "@lucide/svelte";
-  import BasicInformation from "./components/basic-information.svelte";
+  import Form from "./components/form.svelte";
   import { toast } from "svelte-sonner";
   import { apiFetch } from "$lib/utils";
+  import { normalizeFormData } from "$lib/form-normalizer";
+  import { getEmployeeContext } from "../context.svelte";
+
+  const context = getEmployeeContext();
+
   async function onsubmit(e: SubmitEvent) {
     e.preventDefault();
     const form = e.target as HTMLFormElement;
-    const formData = new FormData(form);
-    const data = Object.fromEntries(formData.entries());
 
     const res = await apiFetch(`/api/employee`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
+      body: JSON.stringify(normalizeFormData(form)),
     });
 
     if (!res.ok) {
-      toast.error("Failed to create employee");
+      toast.error("Failed to add employee");
       console.error(await res.json());
       return;
     }
+
     toast.success("Employee created successfully");
     form.reset();
     const result = (await res.json()) as {
-      success: boolean;
+      hasContract: boolean;
       employee_pk: number;
+      employee: any;
     };
-    console.log(result);
+
+    context.add(result.employee, result.hasContract);
   }
 </script>
 
@@ -51,6 +57,6 @@
     </Button>
   {/snippet}
   <form class="max-w-md mx-auto" autocomplete="off" {onsubmit}>
-    <BasicInformation />
+    <Form />
   </form>
 </RouteContent>

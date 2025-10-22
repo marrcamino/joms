@@ -13,16 +13,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 $routes = [
   'GET' => [
     '/api/employee' => 'htdocs/api/employee/get.php',
+    '/api/employee/contract' => 'htdocs/api/employee/contract/get.php',
+    '/api/office' => 'htdocs/api/office/get.php',
+    '/api/position-category' => 'htdocs/api/position-category/get.php',
   ],
   'POST' => [
     '/api/employee' => 'htdocs/api/employee/create.php',
     '/api/employee/check-duplicate' => 'htdocs/api/employee/check-duplicate.php',
+    '/api/employee/contract' => 'htdocs/api/employee/contract/create.php',
   ],
   'PUT' => [
-    '/api/employees' => 'htdocs/api/employees/update.php',
+    '/api/employees' => 'htdocs/api/employees/update.php', // this is a sample route yet
   ],
   'DELETE' => [
-    '/api/employees' => 'htdocs/api/employees/delete.php',
+    '/api/contract' => 'htdocs/api/contract/delete.php',
   ],
 ];
 

@@ -2,69 +2,59 @@
   import { buttonVariants } from "$lib/components/ui/button/index.js";
   import { Calendar } from "$lib/components/ui/calendar/index.js";
   import * as Popover from "$lib/components/ui/popover/index.js";
-  import { cn } from "$lib/utils.js";
+  import { cn, formatDate } from "$lib/utils.js";
   import {
     CalendarDate,
     DateFormatter,
     type DateValue,
     getLocalTimeZone,
-    today,
   } from "@internationalized/date";
   import { CalendarIcon, X } from "@lucide/svelte/icons";
   import { onMount } from "svelte";
-  import HiddenInput from "../hidden-input.svelte";
   import { toast } from "svelte-sonner";
+  import HiddenInput from "../hidden-input.svelte";
 
   interface Props {
+    open?: boolean;
+    value?: DateValue;
     closeOnDateSelect?: boolean;
+    placeholder?: DateValue;
+    disabled?: boolean;
     required?: boolean;
     name?: string;
-    maxDate?: "minimumBirthDate";
+    maxDate?: DateValue;
+    minDate?: DateValue;
+    onValueChange?: (value: DateValue | undefined) => void;
     onOpenChangeComplete?: (open: boolean) => void;
     onClipboardPirmissionGranted?: (granted: boolean) => void;
+    triggerOptions?: {
+      class?: string | null;
+      withIcon?: boolean;
+      label?: string | null;
+    };
   }
 
   let {
+    open = $bindable(false),
+    value = $bindable(),
+    maxDate = $bindable(),
+    minDate = $bindable(),
+    placeholder = $bindable(),
     closeOnDateSelect,
     required,
     name,
-    maxDate,
     onOpenChangeComplete,
     onClipboardPirmissionGranted,
+    triggerOptions,
+    onValueChange,
+    disabled,
   }: Props = $props();
 
   const df = new DateFormatter("en-US", {
     dateStyle: "long",
   });
 
-  let value = $state<DateValue | undefined>();
   let contentRef = $state<HTMLElement | null>(null);
-  let open = $state(false);
-
-  function getMinimumBirthDate(): CalendarDate {
-    const now = today(getLocalTimeZone());
-    // subtract 18 years
-    const minDate = now.subtract({ years: 18 });
-    return minDate;
-  }
-
-  function getMinDate() {
-    if (!maxDate) return undefined;
-
-    if (maxDate === "minimumBirthDate") {
-      const date = getMinimumBirthDate();
-      return date;
-    }
-  }
-
-  function getPlaceholderDate() {
-    if (!maxDate) return undefined;
-
-    if (maxDate === "minimumBirthDate") {
-      const date = getMinimumBirthDate();
-      return date;
-    }
-  }
 
   function getDateFromClipboardText(text: string): CalendarDate | undefined {
     const parsedDate = new Date(text);
@@ -84,21 +74,35 @@
       if (!(e.ctrlKey && e.key.toLowerCase() === "v")) return;
 
       e.preventDefault(); // optional: block default paste if needed
+
       try {
         const text = await navigator.clipboard.readText();
 
         const parsedDate = getDateFromClipboardText(text);
+        let description: string = "";
 
-        if (parsedDate) {
-          value = parsedDate;
-          open = false;
-          onClipboardPirmissionGranted?.(true);
+        if (!parsedDate) {
+          description = "The date you copied is invalid";
+          toast.error("Invalid date", { description });
           return;
         }
 
-        toast.error("Invalid date", {
-          description: "The date you copied is invalid.",
-        });
+        if (minDate && minDate.compare(parsedDate) > 0) {
+          description = `Date must be on or after ${formatDate(minDate.toString(), "short")}`;
+          toast.error("Date too early", { description });
+          return;
+        }
+
+        if (maxDate && maxDate.compare(parsedDate) < 0) {
+          toast.error("Date too late", { description });
+          description = `Date must be on or before ${formatDate(maxDate.toString(), "short")}`;
+          return;
+        }
+
+        value = parsedDate;
+        open = false;
+        onValueChange?.(value);
+        onClipboardPirmissionGranted?.(true);
       } catch (err) {
         toast.error("Clipboard access blocked", {
           description: "Enable clipboard permission in your browser.",
@@ -112,10 +116,6 @@
       document.removeEventListener("keydown", handlePasteShortcut);
     };
   });
-
-  // toast.error("Title here", {
-  //   description: "Description here",
-  // });
 </script>
 
 <Popover.Root
@@ -123,16 +123,24 @@
   onOpenChangeComplete={() => onOpenChangeComplete?.(open)}
 >
   <Popover.Trigger
+    {disabled}
     class={cn(
       buttonVariants({
         variant: "outline",
-        class: "w-[280px] justify-start text-left font-normal relative",
+        class: [
+          "justify-start w-full min-w-[40px] text-left font-normal relative",
+          triggerOptions?.class ?? null,
+        ],
       }),
       !value && "text-muted-foreground"
     )}
   >
-    <CalendarIcon />
-    {value ? df.format(value.toDate(getLocalTimeZone())) : "Pick a date"}
+    {#if triggerOptions?.withIcon ?? true}
+      <CalendarIcon />
+    {/if}
+    {value
+      ? df.format(value.toDate(getLocalTimeZone()))
+      : (triggerOptions?.label ?? "Pick a date")}
 
     <button
       data-has-date={value ? "" : null}
@@ -159,14 +167,16 @@
   <Popover.Content bind:ref={contentRef} class="w-auto p-0">
     <Calendar
       onValueChange={(value) => {
-        if (value && closeOnDateSelect) open = false;
+        onValueChange?.(value);
+        if (closeOnDateSelect && value) open = false;
       }}
+      {disabled}
       type="single"
-      bind:value
       class="rounded-md border shadow-sm"
-      captionLayout="dropdown"
-      placeholder={getPlaceholderDate()}
-      maxValue={getMinDate()}
+      bind:value
+      bind:placeholder
+      maxValue={maxDate}
+      minValue={minDate}
     />
   </Popover.Content>
 </Popover.Root>

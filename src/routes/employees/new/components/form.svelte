@@ -16,9 +16,11 @@
   import { apiFetch, mapToOptions } from "$lib/utils";
   import { CircleAlert, Lightbulb, Save } from "@lucide/svelte";
   import { useDebounce } from "runed";
-  import { untrack } from "svelte";
+  import { setContext, untrack } from "svelte";
   import { cubicIn, cubicOut } from "svelte/easing";
   import { fade, slide } from "svelte/transition";
+  import { dateHelper } from "$lib/components/date/helper";
+  import ContractFormFields from "./contract-form-fields.svelte";
 
   const sexList = mapToOptions(SEX_MAP);
   const TIP_KEY = "clipboard_tip_hidden";
@@ -31,6 +33,21 @@
   let extension = $state("");
   let hasDuplicate = $state(false);
   let showTip = $state(false);
+  let firstAndLastNameIsNotEmpty = $state({ value: false });
+
+  setContext("firstAndLastNameIsNotEmpty", firstAndLastNameIsNotEmpty);
+
+  let contractIsRequired = $state(false);
+  $effect(() => {
+    lname;
+    fname;
+
+    untrack(() => {
+      firstAndLastNameIsNotEmpty.value =
+        lname.trim() !== "" && fname.trim() !== "";
+      contractIsRequired = lname.trim() !== "" && fname.trim() !== "";
+    });
+  });
 
   const triggerContent = $derived(
     sexList.find((f) => f.value === sexValue)?.label ?? "Select Sex"
@@ -189,68 +206,62 @@
     <div>
       <div class="flex gap-2">
         <div class="w-full">
-          <Label class="flex-col items-start gap-0" for="sex-select">
-            <div>Sex <span class="text-destructive">*</span></div>
-          </Label>
-          <Select.Root type="single" bind:value={sexValue}>
-            <Select.Trigger
-              class="w-full [&[aria-hidden='true']_input]:translate-x-3 relative"
-              id="sex-select"
-            >
-              <div class="flex items-center gap-1">
-                {#if sexValue}
-                  {@const key = Number(sexValue) as 1 | 2}
-                  {@const Icon = SEX_ICON_MAP[key]}
-                  <Icon class={SEX_COLOR_MAP[key]} />
-                {/if}
-                {triggerContent}
-              </div>
-
-              <HiddenInput
-                required
-                name="sex"
-                value={sexValue}
-                onFormReset={() => {
-                  sexValue = "";
-                }}
-              />
-            </Select.Trigger>
-            <Select.Content>
-              <Select.Group>
-                <Select.Label>Sex</Select.Label>
-                {#each sexList as sex (sex.value)}
-                  {@const key = Number(sex.value) as 1 | 2}
-                  {@const Icon = SEX_ICON_MAP[key]}
-
-                  <Select.Item value={sex.value} label={sex.label}>
+          <Label class="flex-col items-start gap-0">
+            <span>Sex</span>
+            <Select.Root type="single" bind:value={sexValue}>
+              <Select.Trigger
+                class="w-full [&[aria-hidden='true']_input]:translate-x-3 relative"
+              >
+                <div class="flex items-center gap-1">
+                  {#if sexValue}
+                    {@const key = Number(sexValue) as 1 | 2}
+                    {@const Icon = SEX_ICON_MAP[key]}
                     <Icon class={SEX_COLOR_MAP[key]} />
-                    {sex.label}
-                  </Select.Item>
-                {/each}
-              </Select.Group>
-            </Select.Content>
-          </Select.Root>
+                  {/if}
+                  {triggerContent}
+                </div>
+
+                <HiddenInput
+                  name="sex"
+                  value={sexValue}
+                  onFormReset={() => (sexValue = "")}
+                />
+              </Select.Trigger>
+              <Select.Content>
+                <Select.Group>
+                  <Select.Label>Sex</Select.Label>
+                  {#each sexList as sex (sex.value)}
+                    {@const key = Number(sex.value) as 1 | 2}
+                    {@const Icon = SEX_ICON_MAP[key]}
+
+                    <Select.Item value={sex.value} label={sex.label}>
+                      <Icon class={SEX_COLOR_MAP[key]} />
+                      {sex.label}
+                    </Select.Item>
+                  {/each}
+                </Select.Group>
+              </Select.Content>
+            </Select.Root>
+          </Label>
         </div>
 
-        <div>
+        <div class="w-full">
           <Label class="flex-col items-start gap-0">
-            <div>Birthday <span class="text-destructive">*</span></div>
+            <span>Birthday</span>
+            <DatePicker
+              closeOnDateSelect
+              name="birthday"
+              maxDate={dateHelper.getMinimumBirthDate}
+              placeholder={dateHelper.getMinimumBirthDate}
+              onOpenChangeComplete={(open) => {
+                if (open) checkClipboardPermission();
+              }}
+              onClipboardPirmissionGranted={(grandted) => {
+                if (!grandted) return;
+                hideTipForever();
+              }}
+            />
           </Label>
-          <DatePicker
-            closeOnDateSelect
-            required
-            name="birthday"
-            maxDate="minimumBirthDate"
-            onOpenChangeComplete={(open) => {
-              if (!open) return;
-
-              checkClipboardPermission();
-            }}
-            onClipboardPirmissionGranted={(grandted) => {
-              if (!grandted) return;
-              hideTipForever();
-            }}
-          />
         </div>
       </div>
 
@@ -303,7 +314,9 @@
   </div>
 </div>
 
-<div class="mt-4 text-right">
+<ContractFormFields bind:required={contractIsRequired} activeContract />
+
+<div class="mt-4 text-right pb-6">
   <Button type="submit" disabled={isSaving || hasDuplicate}>
     {#if isSaving}
       <Spinner />
