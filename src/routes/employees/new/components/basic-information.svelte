@@ -189,9 +189,7 @@
     <div>
       <div class="flex gap-2">
         <div class="w-full">
-          <Label class="flex-col items-start gap-0" for="sex-select">
-            <div>Sex <span class="text-destructive">*</span></div>
-          </Label>
+          <Label class="flex-col items-start gap-0" for="sex-select">Sex</Label>
           <Select.Root type="single" bind:value={sexValue}>
             <Select.Trigger
               class="w-full [&[aria-hidden='true']_input]:translate-x-3 relative"
@@ -207,7 +205,6 @@
               </div>
 
               <HiddenInput
-                required
                 name="sex"
                 value={sexValue}
                 onFormReset={() => {
@@ -233,12 +230,9 @@
         </div>
 
         <div>
-          <Label class="flex-col items-start gap-0">
-            <div>Birthday <span class="text-destructive">*</span></div>
-          </Label>
+          <Label class="flex-col items-start gap-0">Birthday</Label>
           <DatePicker
             closeOnDateSelect
-            required
             name="birthday"
             maxDate="minimumBirthDate"
             onOpenChangeComplete={(open) => {

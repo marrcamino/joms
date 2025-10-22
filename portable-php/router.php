@@ -13,6 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 $routes = [
   'GET' => [
     '/api/employee' => 'htdocs/api/employee/get.php',
+    '/api/office' => 'htdocs/api/office/get.php',
   ],
   'POST' => [
     '/api/employee' => 'htdocs/api/employee/create.php',

@@ -28,7 +28,6 @@
       success: boolean;
       employee_pk: number;
     };
-    console.log(result);
   }
 </script>
 
