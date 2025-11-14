@@ -27,6 +27,7 @@
   let addDialogState = $state(false);
   let editDialogState = $state(false);
   let deleteAlertDialogState = $state(false);
+  let contractToUpdate: Contract | null = $state(null);
 
   let contractIdToDelete: null | number = $state(null);
   let refetching = $state(false);
@@ -116,7 +117,10 @@
   {/if}
 
   {#await import("./edit-contract-dialog.svelte") then { default: EditContractDialog }}
-    <EditContractDialog bind:open={editDialogState} />
+    <EditContractDialog
+      bind:open={editDialogState}
+      bind:contract={contractToUpdate}
+    />
   {/await}
 
   {#await import("./delete-dialog.svelte") then { default: DeleteDialog }}
@@ -193,6 +197,7 @@
                   <DropdownMenu.Group>
                     <DropdownMenu.Item
                       onclick={async () => {
+                        contractToUpdate = contract;
                         editDialogState = true;
                       }}
                     >

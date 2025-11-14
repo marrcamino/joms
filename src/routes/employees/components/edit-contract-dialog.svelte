@@ -8,17 +8,42 @@
   import { Label } from "$lib/components/ui/label";
   import Spinner from "$lib/components/ui/spinner/spinner.svelte";
   import { Textarea } from "$lib/components/ui/textarea";
-  import { type DateValue } from "@internationalized/date";
+  import { type DateValue, CalendarDate } from "@internationalized/date";
+  import { untrack } from "svelte";
   import { toast } from "svelte-sonner";
 
   interface Props {
     open?: boolean;
+    contract?: Contract | null;
     afterSave?: (contract: Contract) => void;
   }
 
-  let { open = $bindable(false), afterSave }: Props = $props();
+  let {
+    open = $bindable(false),
+    contract = $bindable(),
+    afterSave,
+  }: Props = $props();
+
   let isSaving = $state(false);
+
+  // Form values
   let startDateValue: DateValue | undefined = $state();
+  let endDateValue: DateValue | undefined = $state();
+  let officePk = $state("");
+  let positionCategPk = $state("");
+  let positionTitle = $state("");
+  let rate = $state("");
+
+  function resetForm() {
+    contract = null;
+
+    startDateValue = undefined;
+    endDateValue = undefined;
+    officePk = "";
+    positionCategPk = "";
+    positionTitle = "";
+    rate = "";
+  }
 
   async function onsubmit(e: SubmitEvent) {
     e.preventDefault();
@@ -26,16 +51,43 @@
     toast.success("Updated successfully");
     // afterSave?.(newContract);
   }
+
+  $effect(() => {
+    open;
+
+    untrack(() => {
+      if (!contract || !open) return;
+
+      const [startyear, startmonth, startday] = contract.start_date
+        .split("-")
+        .map(Number);
+      const [endyear, endmonth, endday] = contract.end_date
+        .split("-")
+        .map(Number);
+
+      startDateValue = new CalendarDate(startyear, startmonth, startday);
+      endDateValue = new CalendarDate(endyear, endmonth, endday);
+      officePk = contract.office_fk.toString();
+      positionCategPk = (contract.position_category_fk ?? "")?.toString();
+      positionTitle = contract.designation;
+      rate = contract.rate.toString();
+    });
+  });
 </script>
 
-<Dialog.Root bind:open>
+<Dialog.Root
+  bind:open
+  onOpenChangeComplete={(isOpen) => {
+    if (!isOpen) resetForm();
+  }}
+>
   <Dialog.Content
     class="sm:max-w-[480px]"
     escapeKeydownBehavior={isSaving ? "ignore" : "close"}
     interactOutsideBehavior={isSaving ? "ignore" : "close"}
     disableCloseButton={isSaving}
   >
-    <form {onsubmit} class="grid gap-4" autocomplete="off">
+    <form {onsubmit} class="grid gap-4 grow-0" autocomplete="off">
       <Dialog.Header>
         <Dialog.Title>Edit Contract</Dialog.Title>
         <Dialog.Description>
@@ -45,25 +97,33 @@
         </Dialog.Description>
       </Dialog.Header>
       <div class="space-y-4 relative mt-2">
-        <DateRangePicker allRequired required bind:startDateValue />
+        <DateRangePicker
+          allRequired
+          required
+          bind:startDateValue
+          bind:endDateValue
+        />
 
-        <div>
-          <Label class="flex flex-col gap-1 *:w-full">
+        <div class="w-full">
+          <Label class="flex flex-col gap-1 items-start">
             <div>
               <span>Select Office</span>
               {@render requiredAsterisk()}
             </div>
-            <OfficeSelector required name="officePk" />
+            <OfficeSelector required name="officePk" bind:value={officePk} />
           </Label>
         </div>
 
         <div>
-          <Label class="flex flex-col gap-1 *:w-full">
+          <Label class="flex flex-col gap-1 items-start">
             <div>
               <span>Select Position Category</span>
               {@render requiredAsterisk()}
             </div>
-            <PositionCategorySelector name="positionCategoryFk" />
+            <PositionCategorySelector
+              name="positionCategoryFk"
+              bind:value={positionCategPk}
+            />
           </Label>
         </div>
 
@@ -74,7 +134,12 @@
               {@render requiredAsterisk()}
             </div>
           </Label>
-          <Textarea id="designation" name="designation" required />
+          <Textarea
+            id="designation"
+            name="designation"
+            required
+            bind:value={positionTitle}
+          />
         </div>
 
         <div>
@@ -84,7 +149,14 @@
               {@render requiredAsterisk()}
             </div>
           </Label>
-          <Input id="rate" name="rate" type="number" min="100" required />
+          <Input
+            id="rate"
+            name="rate"
+            type="number"
+            min="100"
+            required
+            bind:value={rate}
+          />
         </div>
 
         <!-- <div class="pt-2">
@@ -110,7 +182,7 @@
         <span class="text-destructive">*</span>
       {/snippet}
 
-      <Dialog.Footer>
+      <Dialog.Footer class="mt-2">
         <Dialog.Close
           class={buttonVariants({ variant: "secondary" })}
           disabled={isSaving}>Cancel</Dialog.Close

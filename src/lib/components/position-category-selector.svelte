@@ -13,14 +13,19 @@
     required?: boolean;
     name?: string;
     noDefaultValue?: boolean;
+    value?: string;
   }
 
-  let { name, required, noDefaultValue }: Props = $props();
+  let {
+    name,
+    required,
+    noDefaultValue,
+    value = $bindable(""),
+  }: Props = $props();
 
   let categories: PositionCategory[] = $state([]);
 
   let open = $state(false);
-  let value = $state("");
   let triggerRef = $state<HTMLButtonElement | null>(null);
 
   const selectedValue = $derived.by(() => {
