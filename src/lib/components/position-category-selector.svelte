@@ -3,7 +3,7 @@
   import { Button } from "$lib/components/ui/button/index.js";
   import * as Command from "$lib/components/ui/command/index.js";
   import * as Popover from "$lib/components/ui/popover/index.js";
-  import { apiFetch, cn } from "$lib/utils.js";
+  import { apiFetch, cn } from "$lib/utils";
   import CheckIcon from "@lucide/svelte/icons/check";
   import ChevronsUpDownIcon from "@lucide/svelte/icons/chevrons-up-down";
   import { onMount, tick } from "svelte";

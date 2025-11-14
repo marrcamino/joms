@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { cn } from "$lib/utils.js";
+  import { cn } from "$lib/utils";
   import Loader from "@lucide/svelte/icons/loader";
   import type { ComponentProps } from "svelte";
 

@@ -2,7 +2,7 @@
   import { Button, buttonVariants } from "$lib/components/ui/button/index.js";
   import * as Dialog from "$lib/components/ui/dialog/index.js";
   import Spinner from "$lib/components/ui/spinner/spinner.svelte";
-  import { normalizeFormData } from "$lib/form-normalizer";
+  import { normalizeFormData } from "$lib/utils";
   import { apiFetch } from "$lib/utils";
   import { toast } from "svelte-sonner";
   import { getEmployeeContext } from "../context.svelte";

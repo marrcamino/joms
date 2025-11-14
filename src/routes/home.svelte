@@ -1,6 +1,6 @@
 <script lang="ts">
   import RouteContent from "$lib/components/route-content.svelte";
-  import { formatFullName } from "$lib/name-formatter";
+  import { formatFullName } from "$lib/utils";
 
   export const mockNames = [
     // Simple name

@@ -2,7 +2,7 @@
   import { buttonVariants } from "$lib/components/ui/button/index.js";
   import { Calendar } from "$lib/components/ui/calendar/index.js";
   import * as Popover from "$lib/components/ui/popover/index.js";
-  import { cn, formatDate } from "$lib/utils.js";
+  import { cn, formatDate } from "$lib/utils";
   import {
     CalendarDate,
     DateFormatter,

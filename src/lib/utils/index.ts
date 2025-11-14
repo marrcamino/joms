@@ -142,77 +142,6 @@ export interface FullNameParts {
 }
 
 /**
- * Returns a formatted full name string with optional professional prefix and suffix.
- *
- * @param parts - Object containing parts of a person's name
- * @returns The formatted full name, suitable for formal display
- *
- * @example
- * ```ts
- * import { formatFullName } from './formatFullName';
- *
- * const fullName = formatFullName({
- *   professionalPrefix: 'Atty.',
- *   firstName: 'Juan',
- *   middleName: 'Carlos',
- *   lastName: 'Dela Cruz',
- *   nameExtension: 'Jr.',
- *   professionalSuffix: 'CPA'
- * });
- *
- * console.log(fullName); // "Atty. Juan Carlos Dela Cruz Jr., CPA"
- * ```
- */
-export function formatFullName(
-  {
-    professionalPrefix,
-    firstName,
-    middleName,
-    lastName,
-    nameExtension,
-    professionalSuffix,
-  }: FullNameParts,
-  format?: { order?: "lastname" | "firstname"; middlename?: "full" | "initial" }
-): string {
-  const middlename =
-    format?.middlename === "initial"
-      ? `${middleName ? middleName.trim().at(0) : ""}.`
-      : `${middleName ? middleName.trim() : ""}`;
-
-  const fullName = [
-    professionalPrefix?.trim(),
-    firstName.trim(),
-    middlename,
-    lastName.trim() + (nameExtension ? "," : ""),
-    formatNameExtension(nameExtension),
-  ]
-    .filter(Boolean)
-    .join(" ");
-
-  if (format?.order === "lastname") {
-    const suffix = professionalSuffix?.trim()
-      ? `, ${professionalSuffix?.trim()}`
-      : "";
-
-    const middleWithExtension = middlename
-      ? `${middlename}${
-          nameExtension ? ", " + (formatNameExtension(nameExtension) ?? "") : ""
-        }`
-      : `${
-          nameExtension ? ", " + (formatNameExtension(nameExtension) ?? "") : ""
-        }`;
-
-    return `${
-      professionalPrefix ? professionalPrefix.trim() + ". " : ""
-    } ${lastName.trim()}, ${firstName.trim()} ${middleWithExtension}${suffix}`;
-  }
-
-  return professionalSuffix?.trim()
-    ? `${fullName}, ${professionalSuffix.trim()}`
-    : fullName;
-}
-
-/**
  * Formats a date (Date object or ISO string) into a readable string.
  *
  * @param input - A Date object or a date string (e.g. "1987-07-12T00:00:00.000Z").
@@ -244,3 +173,6 @@ export function formatDate(
 
   return new Intl.DateTimeFormat("en-US", formatOptions).format(date);
 }
+
+export * from "./form-normalizer";
+export * from "./name-formatter";

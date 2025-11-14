@@ -7,7 +7,7 @@
   import { ScrollArea } from "$lib/components/ui/scroll-area/index.js";
   import * as Sheet from "$lib/components/ui/sheet/index.js";
   import { Skeleton } from "$lib/components/ui/skeleton/index.js";
-  import { formatFullName } from "$lib/name-formatter";
+  import { formatFullName } from "$lib/utils";
   import { apiFetch, formatDate } from "$lib/utils";
   import {
     ArrowRight,

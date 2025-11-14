@@ -5,7 +5,7 @@
   import Form from "./components/form.svelte";
   import { toast } from "svelte-sonner";
   import { apiFetch } from "$lib/utils";
-  import { normalizeFormData } from "$lib/form-normalizer";
+  import { normalizeFormData } from "$lib/utils";
   import { getEmployeeContext } from "../context.svelte";
 
   const context = getEmployeeContext();
