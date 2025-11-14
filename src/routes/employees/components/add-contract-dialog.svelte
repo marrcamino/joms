@@ -83,7 +83,7 @@
     interactOutsideBehavior={isSaving ? "ignore" : "close"}
     disableCloseButton={isSaving}
   >
-    <form {onsubmit} class="grid gap-4" autocomplete="off">
+    <form {onsubmit} class="grid gap-4 w-full" autocomplete="off">
       <Dialog.Header>
         <Dialog.Title>Add New Contract</Dialog.Title>
         <Dialog.Description>

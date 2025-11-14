@@ -13,14 +13,14 @@
   interface Props {
     required?: boolean;
     name?: string;
+    value?: string;
   }
 
-  let { name, required }: Props = $props();
+  let { name, required, value = $bindable("") }: Props = $props();
 
   const officeContext = getOfficeContext();
 
   let open = $state(false);
-  let value = $state("");
   let triggerRef = $state<HTMLButtonElement | null>(null);
 
   const selectedValue = $derived(

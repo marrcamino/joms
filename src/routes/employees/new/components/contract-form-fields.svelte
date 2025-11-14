@@ -52,7 +52,7 @@
   />
 
   <div>
-    <Label class="flex flex-col gap-1 *:w-full">
+    <Label class="flex flex-col gap-1 items-start">
       <div>
         <span>Select Office</span>
         {@render requiredAsterisk()}
@@ -62,7 +62,7 @@
   </div>
 
   <div>
-    <Label class="flex flex-col gap-1 *:w-full">
+    <Label class="flex flex-col gap-1 items-start">
       <div>
         <span>Select Position Category</span>
         {@render requiredAsterisk()}
