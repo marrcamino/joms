@@ -6,13 +6,25 @@
   import { Input } from "$lib/components/ui/input";
   import { Label } from "$lib/components/ui/label";
   import { Textarea } from "$lib/components/ui/textarea";
-  import { type DateValue } from "@internationalized/date";
+  import { apiFetch } from "$lib/utils";
+  import {
+    getLocalTimeZone,
+    today,
+    type DateValue,
+  } from "@internationalized/date";
+  import { untrack } from "svelte";
+  import { fade, slide } from "svelte/transition";
+  import OverlapContracts from "./overlap-contracts.svelte";
 
   interface Props {
     required: boolean;
     asContentOnly?: boolean;
     activeContract?: boolean;
+    /** Force all fields to be required, specially the dates*/
     allRequired?: boolean;
+    hasActiveContract?: boolean;
+    hadOverlap?: boolean;
+    employeeId?: number;
   }
 
   let {
@@ -20,12 +32,89 @@
     asContentOnly,
     activeContract = $bindable(false),
     allRequired,
+    hasActiveContract,
+    hadOverlap = $bindable(false),
+    employeeId,
   }: Props = $props();
+  type OverlapResponse = {
+    error: boolean;
+    message: null | string;
+    overlaps: Contract[];
+  };
+
+  const defaultErrorMessage = `Activating this contract sets it as the current employment period.`;
 
   let startDateValue: DateValue | undefined = $state();
+  let endDateValue: DateValue | undefined = $state();
   let isItReallyRequired = $derived(required && !!startDateValue);
+  let disableCheckbox = $state(false);
+  let errorMessage = $state(defaultErrorMessage);
+  let overlapContracts: Contract[] = $state([]);
 
+  const now = today(getLocalTimeZone());
   const dataAsContent = asContentOnly ? "" : null;
+
+  $effect(() => {
+    endDateValue;
+
+    untrack(() => {
+      if (hasActiveContract) {
+        activeContract = false;
+        disableCheckbox = true;
+        errorMessage = `There’s already an active contract. Only one contract can be active at a time.`;
+        return;
+      }
+
+      if (!endDateValue) {
+        disableCheckbox = false;
+        errorMessage = defaultErrorMessage;
+        return;
+      }
+
+      const isPassed = endDateValue.compare(now);
+      if (isPassed <= 0) {
+        activeContract = false;
+        disableCheckbox = true;
+
+        errorMessage =
+          isPassed === 0
+            ? `You can’t activate this contract because it ends today.`
+            : `You can’t activate this contract because its end date has already passed.`;
+
+        return;
+      }
+
+      disableCheckbox = false;
+      errorMessage = defaultErrorMessage;
+    });
+  });
+
+  $effect(() => {
+    startDateValue;
+    endDateValue;
+
+    untrack(async () => {
+      if (!employeeId || !endDateValue || !startDateValue) return;
+
+      const res = await apiFetch(
+        `/api/employee/contract/check-overlap?employee_id=${employeeId}`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            startDate: startDateValue.toString(),
+            endDate: endDateValue.toString(),
+          }),
+        }
+      );
+
+      if (!res.ok) return;
+
+      const overlapContractsData = (await res.json()) as OverlapResponse;
+
+      overlapContracts = overlapContractsData.overlaps;
+      hadOverlap = overlapContractsData.overlaps.length > 0;
+    });
+  });
 </script>
 
 <div
@@ -48,75 +137,114 @@
   <DateRangePicker
     required={isItReallyRequired}
     bind:startDateValue
+    bind:endDateValue
     {allRequired}
   />
-
-  <div>
-    <Label class="flex flex-col gap-1 items-start">
-      <div>
-        <span>Select Office</span>
-        {@render requiredAsterisk()}
-      </div>
-      <OfficeSelector required={isItReallyRequired} name="officePk" />
-    </Label>
-  </div>
-
-  <div>
-    <Label class="flex flex-col gap-1 items-start">
-      <div>
-        <span>Select Position Category</span>
-        {@render requiredAsterisk()}
-      </div>
-      <PositionCategorySelector name="positionCategoryFk" />
-    </Label>
-  </div>
-
-  <div>
-    <Label for="designation" class="leading-6">
-      <div>
-        <span>Position</span>
-        {@render requiredAsterisk()}
-      </div>
-    </Label>
-    <Textarea
-      id="designation"
-      name="designation"
-      required={isItReallyRequired}
-    />
-  </div>
-
-  <div>
-    <Label for="rate" class="leading-6">
-      <div>
-        <span>Rate</span>
-        {@render requiredAsterisk()}
-      </div>
-    </Label>
-    <Input
-      id="rate"
-      name="rate"
-      type="number"
-      min="100"
-      required={isItReallyRequired}
-    />
-  </div>
-
-  <div class="pt-2">
-    <div class="flex gap-3">
-      <input
-        type="hidden"
-        name="isActive"
-        value={Number(activeContract).toString()}
-      />
-      <Checkbox id="isActive" bind:checked={activeContract} />
-      <div>
-        <Label for="isActive">Set this contract as active</Label>
-        <div class="text-muted-foreground leading-5 mt-1">
-          Marking this contract as active means it will be counted as the
-          current employment period for this employee.
+  <div style="min-height: 410.13px; min-width: 440px;">
+    {#if overlapContracts.length}
+      <div transition:slide={{ axis: "y", delay: 300 }}>
+        <div in:fade={{ delay: 400 }} out:fade>
+          <OverlapContracts
+            contracts={overlapContracts}
+            {startDateValue}
+            {endDateValue}
+          />
         </div>
       </div>
-    </div>
+    {:else}
+      <div transition:slide={{ axis: "y", delay: 300 }}>
+        <div in:fade={{ delay: 400 }} out:fade>
+          <div class="flex flex-col gap-4">
+            <div>
+              <Label class="flex flex-col gap-1 items-start">
+                <div>
+                  <span>Select Office</span>
+                  {@render requiredAsterisk()}
+                </div>
+                <OfficeSelector required={isItReallyRequired} name="officePk" />
+              </Label>
+            </div>
+
+            <div>
+              <Label class="flex flex-col gap-1 items-start">
+                <div>
+                  <span>Select Position Category</span>
+                  {@render requiredAsterisk()}
+                </div>
+                <PositionCategorySelector name="positionCategoryFk" />
+              </Label>
+            </div>
+
+            <div>
+              <Label for="designation" class="leading-6">
+                <div>
+                  <span>Position</span>
+                  {@render requiredAsterisk()}
+                </div>
+              </Label>
+              <Textarea
+                id="designation"
+                name="designation"
+                required={isItReallyRequired}
+              />
+            </div>
+
+            <div>
+              <Label for="rate" class="leading-6">
+                <div>
+                  <span>Rate</span>
+                  {@render requiredAsterisk()}
+                </div>
+              </Label>
+              <Input
+                id="rate"
+                name="rate"
+                type="number"
+                min="100"
+                required={isItReallyRequired}
+              />
+            </div>
+
+            <div class="pt-2">
+              <div class="flex gap-3">
+                <input
+                  type="hidden"
+                  name="isActive"
+                  value={Number(activeContract).toString()}
+                />
+                <Checkbox
+                  id="isActive"
+                  disabled={disableCheckbox}
+                  bind:checked={activeContract}
+                  title={disableCheckbox ? "checkbox is disabled" : null}
+                />
+                <div>
+                  <Label
+                    for="isActive"
+                    aria-disabled={disableCheckbox}
+                    title={disableCheckbox ? "checkbox is disabled" : null}
+                    class="aria-disabled:text-muted-foreground aria-disabled:cursor-not-allowed w-max"
+                    >Set this contract as active</Label
+                  >
+                  <div
+                    aria-invalid={disableCheckbox ? "true" : undefined}
+                    class="transition-colors aria-[invalid]:text-yellow-600 text-muted-foreground leading-5 mt-1"
+                  >
+                    {#key errorMessage}
+                      <div transition:slide={{ axis: "y" }}>
+                        <div in:fade={{ delay: 300 }}>
+                          {errorMessage}
+                        </div>
+                      </div>
+                    {/key}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    {/if}
   </div>
 </div>
 

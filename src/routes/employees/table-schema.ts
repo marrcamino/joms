@@ -14,10 +14,10 @@ export const columns: ColumnDef<Employee, unknown>[] = [
           lastName: row.lastname,
           firstName: row.firstname,
           middleName: row.middlename,
-          nameExtension: row.extension,
+          extension: row.extension,
         },
         {
-          order: "lastname",
+          order: "formal",
         }
       ),
 

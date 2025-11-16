@@ -32,6 +32,7 @@
       withIcon?: boolean;
       label?: string | null;
     };
+    ariaInvalid?: boolean;
   }
 
   let {
@@ -48,6 +49,7 @@
     triggerOptions,
     onValueChange,
     disabled,
+    ariaInvalid,
   }: Props = $props();
 
   const df = new DateFormatter("en-US", {
@@ -128,12 +130,14 @@
       buttonVariants({
         variant: "outline",
         class: [
-          "justify-start w-full min-w-[40px] text-left font-normal relative",
+          "justify-start w-full min-w-[40px] text-left font-normal relative ",
+          "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive aria-invalid:ring-[3px]",
           triggerOptions?.class ?? null,
         ],
       }),
       !value && "text-muted-foreground"
     )}
+    aria-invalid={ariaInvalid ? "true" : undefined}
   >
     {#if triggerOptions?.withIcon ?? true}
       <CalendarIcon />
@@ -143,8 +147,9 @@
       : (triggerOptions?.label ?? "Pick a date")}
 
     <button
+      {disabled}
       data-has-date={value ? "" : null}
-      class="absolute right-2 data-[has-date]:pointer-events-auto pointer-events-none transition-opacity data-[has-date]:opacity-100 opacity-0"
+      class="absolute right-2 data-[has-date]:pointer-events-auto disabled:cursor-auto pointer-events-none transition-opacity data-[has-date]:opacity-100 opacity-0"
       type="button"
       onclick={(e) => {
         e.stopPropagation();

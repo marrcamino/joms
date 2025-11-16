@@ -55,3 +55,31 @@ function pdoParamNullable(mixed $value, ?int $typeIfNotNull = null): int
 
   return $typeIfNotNull;
 }
+
+
+/**
+ * Get overlapping contracts for an employee
+ *
+ * @param PDO $db database instance
+ * @param int $employeeId employee primary key
+ * @param string $startDate new contract start date in ISO format (YYYY-MM-DD)
+ * @param string $endDate new contract end date in ISO format (YYYY-MM-DD)
+ * @return array array of overlapping contracts; empty if none
+ */
+function getOverlappingContracts(PDO $db, int $employeeId, string $startDate, string $endDate): array
+{
+  $stmt = $db->prepare("
+        SELECT * FROM contract
+        WHERE employee_fk = :emp
+          AND :start <= end_date
+          AND :end >= start_date
+    ");
+
+  $stmt->bindValue(':emp', $employeeId, PDO::PARAM_INT);
+  $stmt->bindValue(':start', $startDate, PDO::PARAM_STR);
+  $stmt->bindValue(':end', $endDate, PDO::PARAM_STR);
+
+  $stmt->execute();
+
+  return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}

@@ -4,24 +4,24 @@
   import { Spinner } from "$lib/components/ui/spinner";
   import { apiFetch } from "$lib/utils";
   import { toast } from "svelte-sonner";
+  import { getSideSheetContentContext } from "../context.svelte";
 
   interface Props {
     open?: boolean;
-    contractId: number | null;
-
     afterDelete?: (id: number) => void;
   }
 
-  let { open = $bindable(false), contractId, afterDelete }: Props = $props();
+  let { open = $bindable(false), afterDelete }: Props = $props();
+  const sheetContext = getSideSheetContentContext();
 
   let isDeleting = $state(false);
 
   async function onclick() {
-    if (!contractId) return;
-
+    if (!sheetContext.selectedContract) return;
+    const id = sheetContext.selectedContract.contract_pk;
     try {
       isDeleting = true;
-      const res = await apiFetch(`/api/contract?contract_pk=${contractId}`, {
+      const res = await apiFetch(`/api/contract?contract_pk=${id}`, {
         method: "DELETE",
       });
 
@@ -34,7 +34,7 @@
       }
 
       open = false;
-      afterDelete?.(contractId);
+      afterDelete?.(id);
       isDeleting = false;
       toast.success("Contract deleted succesfully");
     } finally {
@@ -65,7 +65,7 @@
         {#if isDeleting}
           <Spinner />
         {/if}
-        <span>Continue</span>
+        <span>Delete</span>
       </AlertDialog.Action>
     </AlertDialog.Footer>
   </AlertDialog.Content>

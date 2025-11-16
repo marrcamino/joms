@@ -1,6 +1,6 @@
 <?php
 header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
+header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, PATCH, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
 
 // wh Handle preflight request properly
@@ -21,9 +21,13 @@ $routes = [
     '/api/employee' => 'htdocs/api/employee/create.php',
     '/api/employee/check-duplicate' => 'htdocs/api/employee/check-duplicate.php',
     '/api/employee/contract' => 'htdocs/api/employee/contract/create.php',
+    '/api/employee/contract/check-overlap' => 'htdocs/api/employee/contract/check-overlap.php',
   ],
   'PUT' => [
-    '/api/employees' => 'htdocs/api/employees/update.php', // this is a sample route yet
+    '/api/contract' => 'htdocs/api/contract/update.php',
+  ],
+  'PATCH' => [
+    '/api/contract/set-active' => 'htdocs/api/contract/set-active.php',
   ],
   'DELETE' => [
     '/api/contract' => 'htdocs/api/contract/delete.php',

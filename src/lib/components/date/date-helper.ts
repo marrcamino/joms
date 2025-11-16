@@ -27,4 +27,20 @@ export const dateHelper = {
     const now = today(getLocalTimeZone());
     return now.subtract({ days: 1 });
   },
+
+  /** Parses a date string and returns `[year, month, day]` based on the `Asia/Manila` timezone. */
+  parseDateParts(date: string): [number, number, number] {
+    const d = new Date(date);
+
+    const f = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Asia/Manila",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    });
+
+    const [y, m, dd] = f.format(d).split("-").map(Number);
+
+    return [y, m, dd];
+  },
 };

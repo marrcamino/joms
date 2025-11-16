@@ -1,86 +1,36 @@
 <script lang="ts">
   import { Badge } from "$lib/components/ui/badge/index.js";
-  import { Button, buttonVariants } from "$lib/components/ui/button";
-  import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
+  import { Button } from "$lib/components/ui/button";
   import * as Empty from "$lib/components/ui/empty/index.js";
   import * as Item from "$lib/components/ui/item/index.js";
   import { ScrollArea } from "$lib/components/ui/scroll-area/index.js";
   import * as Sheet from "$lib/components/ui/sheet/index.js";
   import { Skeleton } from "$lib/components/ui/skeleton/index.js";
-  import { formatFullName } from "$lib/utils";
-  import { apiFetch, formatDate } from "$lib/utils";
-  import {
-    ArrowRight,
-    EllipsisVertical,
-    FileX2Icon,
-    Pencil,
-    Plus,
-    Trash2,
-  } from "@lucide/svelte";
+  import { formatDate, formatFullName } from "$lib/utils";
+  import { ArrowRight, FileX2Icon, Plus } from "@lucide/svelte";
   import { onMount, untrack } from "svelte";
-  import { getEmployeeContext, sheetIsVisible } from "../context.svelte";
+  import {
+    getEmployeeContext,
+    setSideSheetContentContext,
+    sheetIsVisible,
+  } from "../context.svelte";
   import type AddContractDialogType from "./add-contract-dialog.svelte";
+  import ContractCardActions from "./contract-card-actions.svelte";
 
   const context = getEmployeeContext();
+  /**Current Open Employee Context*/
+  const sheetContext = setSideSheetContentContext();
 
-  // Dialog Open states
-  let addDialogState = $state(false);
-  let editDialogState = $state(false);
-  let deleteAlertDialogState = $state(false);
-  let contractToUpdate: Contract | null = $state(null);
-
-  let contractIdToDelete: null | number = $state(null);
   let refetching = $state(false);
-  let contracts = $state({
-    list: undefined as Contract[] | undefined,
-    add(contract: Contract) {
-      console.log("added?");
-
-      const newList = [contract, ...($state.snapshot(this.list) ?? [])];
-      addDialogState = false;
-      this.list = sortContractsByLatest(newList);
-    },
-    async remove(id: number) {
-      if (!this.list) return;
-
-      console.log("dfgdfg");
-
-      this.list = this.list.filter((c) => c.contract_pk !== id);
-    },
-  });
 
   let AddContractDialog: typeof AddContractDialogType | undefined =
     $state(undefined);
 
-  function sortContractsByLatest(contracts: Contract[]) {
-    return contracts.sort(
-      (a, b) =>
-        new Date(b.start_date).getTime() - new Date(a.start_date).getTime()
-    );
-  }
-
-  async function getContract(employeeId: number) {
-    refetching = true;
-    const res = await apiFetch(
-      `/api/employee/contract?employee_id=${employeeId}`
-    );
-
-    if (!res.ok) {
-      refetching = false;
-      return;
-    }
-
-    const data = ((await res.json()) as { data: Contract[] }).data;
-
-    contracts.list = sortContractsByLatest(data);
-    refetching = false;
-  }
-
   $effect(() => {
     context.openEmployee;
-
     untrack(async () => {
-      if (context.openEmployee) getContract(context.openEmployee.employee_pk);
+      if (!context.openEmployee) return;
+      sheetContext.getContract(context.openEmployee.employee_pk);
     });
   });
 
@@ -89,45 +39,73 @@
   });
 </script>
 
-{#if context.openEmployee}
-  {#if sheetIsVisible.current}
-    <Sheet.Content side="right" class="w-[500px]">
-      <ScrollArea class="h-dvh">
-        <div class="px-4 pb-4">
-          {@render actualContent(context.openEmployee)}
-        </div>
-      </ScrollArea>
-    </Sheet.Content>
-  {:else}
-    {@render actualContent(context.openEmployee)}
-  {/if}
+{#if sheetIsVisible.current}
+  <Sheet.Root bind:open={context.sheetOpenState}>
+    {@render sheetContent()}
+  </Sheet.Root>
 {:else}
-  <!-- This should only appear when the screen is big -->
-  <div class="text-muted-foreground text-center max-[930px]:hidden">
-    No employee currently selected
+  <div class="pl-4 w-[400px]">
+    <div class="border rounded-lg p-4">
+      {@render sheetContent()}
+    </div>
   </div>
 {/if}
+
+{#snippet sheetContent()}
+  {#if context.openEmployee}
+    {#if sheetIsVisible.current}
+      <Sheet.Content side="right" class="w-[500px]">
+        <ScrollArea class="h-dvh">
+          <div class="px-4 pb-4">
+            {@render actualContent(context.openEmployee)}
+          </div>
+        </ScrollArea>
+      </Sheet.Content>
+    {:else}
+      {@render actualContent(context.openEmployee)}
+    {/if}
+  {:else}
+    <!-- This should only appear when the screen is big -->
+    <div class="text-muted-foreground text-center max-[930px]:hidden">
+      No employee currently selected
+    </div>
+  {/if}
+{/snippet}
 
 {#snippet actualContent(emp: Employee)}
   {#if AddContractDialog}
     <AddContractDialog
-      bind:open={addDialogState}
-      afterSave={(id) => contracts.add(id)}
+      bind:open={sheetContext.addDialogState}
+      afterSave={(id) => {
+        sheetContext.add(id);
+        sheetContext.addDialogState = false;
+      }}
     />
   {/if}
 
   {#await import("./edit-contract-dialog.svelte") then { default: EditContractDialog }}
     <EditContractDialog
-      bind:open={editDialogState}
-      bind:contract={contractToUpdate}
+      bind:open={sheetContext.editDialogState}
+      afterUpdate={(c) => sheetContext.update(c)}
     />
   {/await}
 
-  {#await import("./delete-dialog.svelte") then { default: DeleteDialog }}
-    <DeleteDialog
-      bind:open={deleteAlertDialogState}
-      contractId={contractIdToDelete}
-      afterDelete={(id) => contracts.remove(id)}
+  {#await import("./delete-alert-dialog.svelte") then { default: DeleteAlertDialog }}
+    <DeleteAlertDialog
+      bind:open={sheetContext.deleteAlertDialogState}
+      afterDelete={(id) => sheetContext.remove(id)}
+    />
+  {/await}
+
+  {#await import("./activate-contract-alert-dialog.svelte") then { default: ActiveContractAlertDialog }}
+    <ActiveContractAlertDialog
+      bind:open={sheetContext.activeContractAlertDialogState}
+    />
+  {/await}
+
+  {#await import("./deactivate-contract-alert-dialog.svelte") then { default: DeactiveContractAlertDialog }}
+    <DeactiveContractAlertDialog
+      bind:open={sheetContext.deactiveContractAlertDialogState}
     />
   {/await}
 
@@ -157,7 +135,7 @@
       class="ml-auto"
       disabled={!AddContractDialog}
       variant="secondary"
-      onclick={() => (addDialogState = true)}>Add Contract</Button
+      onclick={() => (sheetContext.addDialogState = true)}>Add Contract</Button
     >
   </div>
 
@@ -165,8 +143,8 @@
     class="flex flex-col gap-2 data-[refetching]:opacity-50 data-[refetching]:pointer-events-none transition-opacity"
     data-refetching={refetching ? "" : null}
   >
-    {#if contracts}
-      {#each contracts.list as contract (contract.contract_pk)}
+    {#if sheetContext}
+      {#each sheetContext.contracts as contract (contract.contract_pk)}
         <Item.Root variant="muted">
           <Item.Content>
             <Item.Title class="w-full ">
@@ -182,42 +160,7 @@
                 </Badge>
               {/if}
 
-              <DropdownMenu.Root>
-                <DropdownMenu.Trigger
-                  class={buttonVariants({
-                    variant: "ghost",
-                    class:
-                      "h-6 has-[>svg]:px-1 ml-auto relative rounded-sm text-muted-foreground",
-                  })}
-                >
-                  <EllipsisVertical />
-                  <span class="sr-only">open</span>
-                </DropdownMenu.Trigger>
-                <DropdownMenu.Content align="end">
-                  <DropdownMenu.Group>
-                    <DropdownMenu.Item
-                      onclick={async () => {
-                        contractToUpdate = contract;
-                        editDialogState = true;
-                      }}
-                    >
-                      <Pencil />
-                      Edit
-                    </DropdownMenu.Item>
-                    <DropdownMenu.Item
-                      variant="destructive"
-                      onclick={() => {
-                        contractIdToDelete = contract.contract_pk;
-                        deleteAlertDialogState = true;
-                      }}
-                    >
-                      <Trash2 />
-                      <!-- onclick={() => contracts.remove(contract.contract_pk)} -->
-                      Delete
-                    </DropdownMenu.Item>
-                  </DropdownMenu.Group>
-                </DropdownMenu.Content>
-              </DropdownMenu.Root>
+              <ContractCardActions {contract} />
             </Item.Title>
             <Item.Description class="text-wrap">
               {contract.designation}
@@ -242,7 +185,7 @@
               size="sm"
               type="button"
               disabled={!AddContractDialog}
-              onclick={() => (addDialogState = true)}
+              onclick={() => (sheetContext.addDialogState = true)}
             >
               <Plus />
               Add Contract

@@ -2,13 +2,18 @@
   import { CalendarDate, type DateValue } from "@internationalized/date";
   import { Label } from "../ui/label";
   import DatePicker from "./date-picker.svelte";
-  import { dateHelper } from "./helper";
 
   interface Props {
     required?: boolean;
     startDateValue?: DateValue;
     endDateValue?: DateValue;
     allRequired?: boolean;
+    startMaxDate?: DateValue;
+    startMinDate?: DateValue;
+    endMaxDate?: DateValue;
+    endMinDate?: DateValue;
+    startDateInvalid?: boolean;
+    endDateInvalid?: boolean;
     onValueChange?: (dates: {
       startDate: DateValue | undefined;
       endDate: DateValue | undefined;
@@ -21,12 +26,17 @@
     onValueChange,
     startDateValue = $bindable(),
     endDateValue = $bindable(),
+    // Min and Max values
+    startMaxDate = $bindable(),
+    startMinDate = $bindable(),
+    endMaxDate = $bindable(),
+    endMinDate = $bindable(),
+    startDateInvalid,
+    endDateInvalid,
   }: Props = $props();
 
-  // let startDateValue: DateValue | undefined = $state();
-  // let endDateValue: DateValue | undefined = $state();
   let endDateOpenState = $state(false);
-  let endDateMinDate: CalendarDate | undefined = $derived(undefined);
+  // let endMinDate: CalendarDate | undefined = $derived(undefined);
   let endDatePlaceholder: DateValue | undefined = $state();
 
   /** This will set/reset end date's value and placeholder*/
@@ -42,7 +52,7 @@
       if (result < 0) endDateValue = undefined; // -1 = A < B, 1 = A > B, 0 = same day
     }
 
-    endDateMinDate = minDate;
+    endMinDate = minDate;
     endDatePlaceholder = minDate;
   }
 </script>
@@ -61,7 +71,9 @@
         closeOnDateSelect
         name="startDate"
         required={allRequired}
-        maxDate={dateHelper.getToday}
+        bind:maxDate={startMaxDate}
+        bind:minDate={startMinDate}
+        ariaInvalid={startDateInvalid}
         onValueChange={() => {
           if (startDateValue) {
             setEndDateValues();
@@ -92,10 +104,12 @@
         closeOnDateSelect
         name="endDate"
         required={allRequired ? true : !!startDateValue && required}
-        minDate={endDateMinDate}
+        bind:minDate={endMinDate}
+        bind:maxDate={endMaxDate}
         bind:value={endDateValue}
         bind:open={endDateOpenState}
         bind:placeholder={endDatePlaceholder}
+        ariaInvalid={endDateInvalid}
         disabled={!startDateValue}
         triggerOptions={{
           withIcon: false,

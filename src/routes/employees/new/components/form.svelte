@@ -1,6 +1,6 @@
 <script lang="ts">
   import DatePicker from "$lib/components/date/date-picker.svelte";
-  import { dateHelper } from "$lib/components/date/helper";
+  import { dateHelper } from "$lib/components/date/date-helper";
   import HiddenInput from "$lib/components/hidden-input.svelte";
   import * as Alert from "$lib/components/ui/alert/index.js";
   import Button from "$lib/components/ui/button/button.svelte";

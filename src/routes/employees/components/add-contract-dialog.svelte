@@ -5,7 +5,10 @@
   import { normalizeFormData } from "$lib/utils";
   import { apiFetch } from "$lib/utils";
   import { toast } from "svelte-sonner";
-  import { getEmployeeContext } from "../context.svelte";
+  import {
+    getEmployeeContext,
+    getSideSheetContentContext,
+  } from "../context.svelte";
   import ContractFormFields from "../new/components/contract-form-fields.svelte";
 
   interface Props {
@@ -25,54 +28,62 @@
 
   let { open = $bindable(false), afterSave }: Props = $props();
   let isSaving = $state(false);
+  let hasOverlaps = $state(false);
 
   const context = getEmployeeContext();
+  const sheetContent = getSideSheetContentContext();
 
   async function onsubmit(e: SubmitEvent) {
     e.preventDefault();
 
-    const employeeId = $state.snapshot(context.openEmployee?.employee_pk);
+    try {
+      const employeeId = $state.snapshot(context.openEmployee?.employee_pk);
 
-    if (!employeeId) {
-      console.error("Walay id sa employee");
-      return;
-    }
-
-    const form = e.currentTarget as HTMLFormElement;
-    const formData = normalizeFormData(form) as FormData;
-
-    if (!formData.startDate) return;
-
-    const res = await apiFetch(
-      `/api/employee/contract?employee_id=${employeeId}`,
-      {
-        method: "POST",
-        body: JSON.stringify(formData),
+      if (!employeeId) {
+        console.error("Walay id sa employee");
+        return;
       }
-    );
 
-    if (!res.ok) {
-      toast.error("An error occor while saving contract");
-      return;
+      const form = e.currentTarget as HTMLFormElement;
+      const formData = normalizeFormData(form) as FormData;
+
+      if (!formData.startDate) return;
+      isSaving = true;
+      const res = await apiFetch(
+        `/api/employee/contract?employee_id=${employeeId}`,
+        {
+          method: "POST",
+          body: JSON.stringify(formData),
+        }
+      );
+
+      if (!res.ok) {
+        toast.error("An error occor while saving contract", {
+          description: "Please try again",
+        });
+        return;
+      }
+
+      const contactPk = ((await res.json()) as { contract_pk: number })
+        .contract_pk;
+
+      const newContract: Contract = {
+        contract_pk: contactPk,
+        employee_fk: employeeId,
+        start_date: formData.startDate,
+        end_date: formData.endDate,
+        designation: formData.designation,
+        rate: formData.rate,
+        office_fk: formData.officePk,
+        position_category_fk: formData.positionCategoryFk,
+        is_active: formData.isActive,
+      };
+
+      toast.success("Successfully added");
+      afterSave?.(newContract);
+    } finally {
+      isSaving = false;
     }
-
-    const contactPk = ((await res.json()) as { contract_pk: number })
-      .contract_pk;
-
-    const newContract: Contract = {
-      contract_pk: contactPk,
-      employee_fk: employeeId,
-      start_date: formData.startDate,
-      end_date: formData.endDate,
-      designation: formData.designation,
-      rate: formData.rate,
-      office_fk: formData.officePk,
-      position_category_fk: formData.positionCategoryFk,
-      is_active: formData.isActive,
-    };
-
-    toast.success("Successfully added");
-    afterSave?.(newContract);
   }
 </script>
 
@@ -92,13 +103,21 @@
           >&rpar; are required.
         </Dialog.Description>
       </Dialog.Header>
-      <ContractFormFields required asContentOnly allRequired />
+      <ContractFormFields
+        required
+        asContentOnly
+        allRequired
+        hasActiveContract={sheetContent.hasActiveContract}
+        employeeId={context.openEmployee?.employee_pk}
+        bind:hadOverlap={hasOverlaps}
+      />
       <Dialog.Footer>
         <Dialog.Close
           disabled={isSaving}
+          type="button"
           class={buttonVariants({ variant: "secondary" })}>Cancel</Dialog.Close
         >
-        <Button type="submit" disabled={isSaving}>
+        <Button type="submit" disabled={isSaving || hasOverlaps}>
           {#if isSaving}
             <Spinner />
           {/if}
