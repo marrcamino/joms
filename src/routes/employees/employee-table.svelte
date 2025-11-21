@@ -74,7 +74,7 @@
   });
 </script>
 
-<div class="rounded-md border grow max-w-4xl">
+<div class="rounded-md border grow max-w-4xl w-full">
   <Table.Root>
     <Table.Header>
       {#each table.getHeaderGroups() as headerGroup (headerGroup.id)}

@@ -44,6 +44,7 @@
   // Form values
   let startDateValue: DateValue | undefined = $state();
   let endDateValue: DateValue | undefined = $state();
+  let endMinDate: DateValue | undefined = $state();
   let officePk = $state("");
   let positionCategPk = $state("");
   let positionTitle = $state("");
@@ -63,14 +64,6 @@
     positionTitle = "";
     rate = "";
   }
-  const fddfd = {
-    startDate: "2025-11-12",
-    endDate: "2025-11-28",
-    officePk: 2,
-    positionCategoryFk: null,
-    designation: "fgdhfg43",
-    rate: 345,
-  };
 
   async function onsubmit(e: SubmitEvent) {
     e.preventDefault();
@@ -89,7 +82,6 @@
 
       const form = e.currentTarget as HTMLFormElement;
       const formData = normalizeFormData(form) as FormData;
-      console.log(formData);
 
       const res = await apiFetch(`/api/contract?contract_pk=${contract_pk}`, {
         method: "PUT",
@@ -137,6 +129,9 @@
         selectedContract.end_date
       );
 
+      // Setting End Date Min Value
+      endMinDate = new CalendarDate(startyear, startmonth, startday);
+
       startDateValue = new CalendarDate(startyear, startmonth, startday);
       endDateValue = new CalendarDate(endyear, endmonth, endday);
       officePk = selectedContract.office_fk.toString();
@@ -155,6 +150,13 @@
     untrack(async () => {
       if (!sheetContent.selectedContract) return;
 
+      // Setting End Date Min Value
+      if (endMinDate) {
+        const [year, month, day] = dateHelper.parseDateParts(
+          endMinDate.toString()
+        );
+        endMinDate = new CalendarDate(year, month, day);
+      }
       const employeeId = sheetContent.selectedContract.employee_fk;
 
       if (!employeeId || !endDateValue || !startDateValue) return;
@@ -210,6 +212,7 @@
           required
           bind:startDateValue
           bind:endDateValue
+          bind:endMinDate
         />
 
         <div style="min-height: 322.95.13px; min-width: 440px;">

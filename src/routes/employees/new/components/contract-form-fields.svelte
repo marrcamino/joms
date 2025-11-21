@@ -72,15 +72,11 @@
       }
 
       const isPassed = endDateValue.compare(now);
-      if (isPassed <= 0) {
+      if (isPassed < 0) {
         activeContract = false;
         disableCheckbox = true;
 
-        errorMessage =
-          isPassed === 0
-            ? `You can’t activate this contract because it ends today.`
-            : `You can’t activate this contract because its end date has already passed.`;
-
+        errorMessage = `You can’t activate this contract because its end date has already passed.`;
         return;
       }
 

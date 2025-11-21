@@ -1,7 +1,6 @@
 <script lang="ts">
   import { Button } from "$lib/components/ui/button";
-  import { Eye } from "@lucide/svelte";
-  import { getEmployeeContext, sheetIsVisible } from "../context.svelte";
+  import { getEmployeeContext } from "../context.svelte";
 
   interface Props {
     employee: Employee;
@@ -17,8 +16,7 @@
 </script>
 
 <div class="place-self-center">
-  <Button size="icon-sm" {onclick}>
-    <span class="sr-only">open sheet</span>
-    <Eye />
+  <Button {onclick} size="sm">
+    <span>View</span>
   </Button>
 </div>

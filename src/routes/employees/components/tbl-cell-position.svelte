@@ -1,5 +1,6 @@
 <script lang="ts">
   import { Badge } from "$lib/components/ui/badge/index.js";
+  import * as Tooltip from "$lib/components/ui/tooltip/index.js";
   import { getOfficeContext } from "$routes/offices/context.svelte";
 
   interface Props {
@@ -12,21 +13,26 @@
   const officeContext = getOfficeContext();
 </script>
 
-<p>
+<p class="text-pretty min-w-[300px]">
   {#if designation}
+    {@const office = office_fk ? officeContext.getOffice(office_fk) : undefined}
+
     <span>
       {designation}
     </span>
 
-    {@const office = office_fk ? officeContext.getOffice(office_fk) : undefined}
     {#if office}
-      <Badge
-        variant="outline"
-        class="ml-1 cursor-help"
-        title={office.office_title}
-      >
-        {office.office_abbr}
-      </Badge>
+      <Tooltip.Provider>
+        <Tooltip.Root>
+          <Tooltip.Trigger
+            class="focus-visible:border-ring ml-1 focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive inline-flex w-fit shrink-0 items-center justify-center gap-1 overflow-hidden whitespace-nowrap rounded-full border px-2 py-0.5 text-xs font-medium transition-[color,box-shadow] focus-visible:ring-[3px] text-foreground hover:bg-accent dark:hover:bg-input/50"
+            >{office.office_abbr}</Tooltip.Trigger
+          >
+          <Tooltip.Content>
+            <p>{office.office_title}</p>
+          </Tooltip.Content>
+        </Tooltip.Root>
+      </Tooltip.Provider>
     {/if}
   {:else}
     <Badge variant="destructive">Inactive</Badge>

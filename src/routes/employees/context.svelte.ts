@@ -1,4 +1,4 @@
-import { apiFetch } from "$lib/utils";
+import { apiFetch, createLOSCalculator } from "$lib/utils";
 import { getContext, setContext } from "svelte";
 import { MediaQuery } from "svelte/reactivity";
 
@@ -74,12 +74,14 @@ function createSideSheetContentContext() {
   /** For `deleting` or `Updating` contract */
   let selectedContract: null | Contract = $state(null);
 
+  const los = createLOSCalculator();
   // Dialog States
   let addDialogState = $state(false);
   let editDialogState = $state(false);
   let deleteAlertDialogState = $state(false);
   let activeContractAlertDialogState = $state(false);
   let deactiveContractAlertDialogState = $state(false);
+  let counts = $derived(los.calculate(contracts ?? []));
 
   let isFetching = $state(false);
   let hasActiveContract = $derived(
@@ -181,6 +183,13 @@ function createSideSheetContentContext() {
     },
     get deactiveContractAlertDialogState() {
       return deactiveContractAlertDialogState;
+    },
+    get counts() {
+      return counts;
+    },
+    /** Length of Service Calculator */
+    get los() {
+      return los;
     },
 
     set contracts(v: undefined | Contract[]) {

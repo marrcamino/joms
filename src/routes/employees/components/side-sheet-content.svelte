@@ -16,6 +16,7 @@
   } from "../context.svelte";
   import type AddContractDialogType from "./add-contract-dialog.svelte";
   import ContractCardActions from "./contract-card-actions.svelte";
+  import DurationPreview from "./duration-preview.svelte";
 
   const context = getEmployeeContext();
   /**Current Open Employee Context*/
@@ -44,7 +45,7 @@
     {@render sheetContent()}
   </Sheet.Root>
 {:else}
-  <div class="pl-4 w-[400px]">
+  <div class="pl-4 w-[400px] min-w-[400px]">
     <div class="border rounded-lg p-4">
       {@render sheetContent()}
     </div>
@@ -126,9 +127,8 @@
     {emp.designation}
   </div>
 
-  <div class="text-md pb-2 pt-4 flex items-center">
-    <span>Duration: </span>
-    <span class="text-muted-foreground ml-1">3y7m2d</span>
+  <div class="pb-2 pt-4 flex items-center">
+    <DurationPreview />
 
     <Button
       size="sm"

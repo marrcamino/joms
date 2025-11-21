@@ -35,6 +35,7 @@
 
   async function onsubmit(e: SubmitEvent) {
     e.preventDefault();
+    if (hasOverlaps) return;
 
     try {
       const employeeId = $state.snapshot(context.openEmployee?.employee_pk);
