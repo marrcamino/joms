@@ -14,6 +14,11 @@
     name?: string;
     noDefaultValue?: boolean;
     value?: string;
+    /**
+     * This will use to set trigger and content, default is `w-[413.5px]`
+     * This must be a tailwind class
+     * */
+    width?: string;
   }
 
   let {
@@ -21,6 +26,7 @@
     required,
     noDefaultValue,
     value = $bindable(""),
+    width = "w-[413.5px]",
   }: Props = $props();
 
   let categories: PositionCategory[] = $state([]);
@@ -60,13 +66,16 @@
     {#snippet child({ props })}
       <Button
         {...props}
-        data-has-value={selectedValue ? "" : null}
-        class="justify-between relative w-[440px] text-muted-foreground data-[has-value]:text-foreground"
+        class={cn(
+          "justify-between relative min-w-[410px] w-full text-muted-foreground data-[has-value]:text-foreground",
+          width
+        )}
         type="button"
         role="combobox"
         variant="outline"
         aria-expanded={open}
         title={selectedValue}
+        style="width: {width}px;"
       >
         <span class="truncate">
           {selectedValue || "Select office..."}
@@ -84,7 +93,7 @@
       </Button>
     {/snippet}
   </Popover.Trigger>
-  <Popover.Content class="p-0 w-[440px]">
+  <Popover.Content class={cn("p-0", width)}>
     <Command.Root>
       <Command.Input placeholder="Search category..." />
       <Command.List>

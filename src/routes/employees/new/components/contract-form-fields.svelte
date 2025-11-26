@@ -53,6 +53,7 @@
 
   const now = today(getLocalTimeZone());
   const dataAsContent = asContentOnly ? "" : null;
+  const width = "w-[413.5px]";
 
   $effect(() => {
     endDateValue;
@@ -136,7 +137,7 @@
     bind:endDateValue
     {allRequired}
   />
-  <div style="min-height: 410.13px; min-width: 440px;">
+  <div style="min-height: 410.13px; min-width: 410px;">
     {#if overlapContracts.length}
       <div transition:slide={{ axis: "y", delay: 300 }}>
         <div in:fade={{ delay: 400 }} out:fade>
@@ -157,7 +158,11 @@
                   <span>Select Office</span>
                   {@render requiredAsterisk()}
                 </div>
-                <OfficeSelector required={isItReallyRequired} name="officePk" />
+                <OfficeSelector
+                  required={isItReallyRequired}
+                  name="officePk"
+                  {width}
+                />
               </Label>
             </div>
 
@@ -167,7 +172,7 @@
                   <span>Select Position Category</span>
                   {@render requiredAsterisk()}
                 </div>
-                <PositionCategorySelector name="positionCategoryFk" />
+                <PositionCategorySelector name="positionCategoryFk" {width} />
               </Label>
             </div>
 

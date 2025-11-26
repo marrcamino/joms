@@ -14,9 +14,19 @@
     required?: boolean;
     name?: string;
     value?: string;
+    /**
+     * This will use to set trigger and content, default is `w-[413.5px]`
+     * This must be a tailwind class
+     * */
+    width?: string;
   }
 
-  let { name, required, value = $bindable("") }: Props = $props();
+  let {
+    name,
+    required,
+    value = $bindable(""),
+    width = "w-[413.5px]",
+  }: Props = $props();
 
   const officeContext = getOfficeContext();
 
@@ -44,7 +54,10 @@
       <Button
         {...props}
         data-has-value={selectedValue ? "" : null}
-        class="justify-between relative w-[440px] text-muted-foreground data-[has-value]:text-foreground"
+        class={cn(
+          "justify-between relative text-muted-foreground data-[has-value]:text-foreground",
+          width
+        )}
         type="button"
         role="combobox"
         variant="outline"
@@ -67,7 +80,7 @@
       </Button>
     {/snippet}
   </Popover.Trigger>
-  <Popover.Content class="p-0 w-[440px]">
+  <Popover.Content class={cn("p-0", width)}>
     <Command.Root>
       <Command.Input placeholder="Search office..." />
       <Command.List>

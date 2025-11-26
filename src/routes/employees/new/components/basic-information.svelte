@@ -1,6 +1,6 @@
 <script lang="ts">
-  import DatePicker from "$lib/components/date/date-picker.svelte";
   import { dateHelper } from "$lib/components/date/date-helper";
+  import DatePicker from "$lib/components/date/date-picker.svelte";
   import HiddenInput from "$lib/components/hidden-input.svelte";
   import * as Alert from "$lib/components/ui/alert/index.js";
   import Button from "$lib/components/ui/button/button.svelte";
@@ -9,22 +9,24 @@
   import * as Kbd from "$lib/components/ui/kbd/index.js";
   import { Label } from "$lib/components/ui/label/index.js";
   import * as Select from "$lib/components/ui/select/index.js";
-  import { Spinner } from "$lib/components/ui/spinner/index.js";
   import { Textarea } from "$lib/components/ui/textarea/index.js";
   import { SEX_COLOR_MAP, SEX_ICON_MAP, SEX_MAP } from "$lib/constants";
   import { apiFetch, mapToOptions } from "$lib/utils";
-  import { CircleAlert, Lightbulb, Save } from "@lucide/svelte";
+  import { CircleAlert, Lightbulb } from "@lucide/svelte";
   import { useDebounce } from "runed";
-  import { setContext, untrack } from "svelte";
+  import { untrack } from "svelte";
   import { cubicIn, cubicOut } from "svelte/easing";
   import { fade, slide } from "svelte/transition";
-  import ContractFormFields from "./contract-form-fields.svelte";
-  import BasicInformation from "./basic-information.svelte";
+
+  interface Props {
+    contractIsRequired?: boolean;
+  }
+
+  let { contractIsRequired = $bindable() }: Props = $props();
 
   const sexList = mapToOptions(SEX_MAP);
   const TIP_KEY = "clipboard_tip_hidden";
 
-  let isSaving = $state(false);
   let sexValue = $state("");
   let lname = $state("");
   let fname = $state("");
@@ -32,18 +34,12 @@
   let extension = $state("");
   let hasDuplicate = $state(false);
   let showTip = $state(false);
-  let firstAndLastNameIsNotEmpty = $state({ value: false });
 
-  // setContext("firstAndLastNameIsNotEmpty", firstAndLastNameIsNotEmpty);
-
-  let contractIsRequired = $state(false);
   $effect(() => {
     lname;
     fname;
 
     untrack(() => {
-      firstAndLastNameIsNotEmpty.value =
-        lname.trim() !== "" && fname.trim() !== "";
       contractIsRequired = lname.trim() !== "" && fname.trim() !== "";
     });
   });
@@ -108,7 +104,7 @@
   }
 </script>
 
-<!-- <div
+<div
   class="py-4 shadow border px-4 rounded-xl bg-accent/10 space-y-4 mt-6 relative"
 >
   <div class="grid gap-2 [&_label]:leading-6">
@@ -311,20 +307,4 @@
       <Textarea id="address" name="address" autoHeight autoTrim />
     </div>
   </div>
-</div> -->
-
-<BasicInformation bind:contractIsRequired />
-
-<ContractFormFields bind:required={contractIsRequired} activeContract />
-
-<div class="mt-4 text-right pb-6">
-  <Button type="submit" disabled={isSaving || hasDuplicate}>
-    {#if isSaving}
-      <Spinner />
-      <span>Saving...</span>
-    {:else}
-      <Save />
-      <span>Add Employee</span>
-    {/if}
-  </Button>
 </div>

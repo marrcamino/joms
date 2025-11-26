@@ -192,7 +192,7 @@
   }}
 >
   <Dialog.Content
-    class="sm:max-w-[480px]"
+    class="sm:max-w-[460px]"
     escapeKeydownBehavior={isSaving ? "ignore" : "close"}
     interactOutsideBehavior={isSaving ? "ignore" : "close"}
     disableCloseButton={isSaving}
@@ -215,7 +215,7 @@
           bind:endMinDate
         />
 
-        <div style="min-height: 322.95.13px; min-width: 440px;">
+        <div style="min-height: 322.95.13px; min-width: 413.5px;">
           {#if overlapContracts.length}
             <div transition:slide={{ axis: "y", delay: 300 }}>
               <div in:fade={{ delay: 400 }} out:fade>

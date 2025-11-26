@@ -22,10 +22,10 @@
     </span>
 
     {#if office}
-      <Tooltip.Provider>
+      <Tooltip.Provider delayDuration={300}>
         <Tooltip.Root>
           <Tooltip.Trigger
-            class="focus-visible:border-ring ml-1 focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive inline-flex w-fit shrink-0 items-center justify-center gap-1 overflow-hidden whitespace-nowrap rounded-full border px-2 py-0.5 text-xs font-medium transition-[color,box-shadow] focus-visible:ring-[3px] text-foreground hover:bg-accent dark:hover:bg-input/50"
+            class="focus-visible:border-ring ml-1 cursor-help focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive inline-flex w-fit shrink-0 items-center justify-center gap-1 overflow-hidden whitespace-nowrap rounded-full border px-2 py-0.5 text-xs font-medium transition-[color,box-shadow] focus-visible:ring-[3px] text-foreground hover:bg-accent dark:hover:bg-input/50"
             >{office.office_abbr}</Tooltip.Trigger
           >
           <Tooltip.Content>

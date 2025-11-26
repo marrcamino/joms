@@ -13,13 +13,13 @@
   <div class="text-muted-foreground text-sm pl-1 leading-3.5">
     Length of Service
   </div>
-  <HoverCard.Root openDelay={0} closeDelay={0}>
+  <HoverCard.Root openDelay={100} closeDelay={0}>
     <HoverCard.Trigger
-      class="relative cursor-pointer w-max flex items-center hover:*:data-border:border-foreground"
+      class="relative cursor-default w-max flex items-center hover:*:data-border:border-foreground"
     >
       <div
         data-border
-        class="border-b w-[95%] translate-x-1 absolute border-muted-foreground/80 bottom-0.5 border-dashed"
+        class="border-b w-[95%] translate-x-1 absolute border-muted-foreground/80 bottom-[1px] border-dashed"
       ></div>
       <div class="ml-1 w-full">
         <NumberFlow value={years} suffix={years > 1 ? "yrs" : "yr"} />

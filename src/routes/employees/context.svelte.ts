@@ -78,6 +78,7 @@ function createSideSheetContentContext() {
   // Dialog States
   let addDialogState = $state(false);
   let editDialogState = $state(false);
+  let editEmployeeState = $state(false);
   let deleteAlertDialogState = $state(false);
   let activeContractAlertDialogState = $state(false);
   let deactiveContractAlertDialogState = $state(false);
@@ -169,6 +170,9 @@ function createSideSheetContentContext() {
     get editDialogState() {
       return editDialogState;
     },
+    get editEmployeeState() {
+      return editEmployeeState;
+    },
     get deleteAlertDialogState() {
       return deleteAlertDialogState;
     },
@@ -203,6 +207,9 @@ function createSideSheetContentContext() {
     },
     set editDialogState(v: boolean) {
       editDialogState = v;
+    },
+    set editEmployeeState(v: boolean) {
+      editEmployeeState = v;
     },
     set deleteAlertDialogState(v: boolean) {
       deleteAlertDialogState = v;

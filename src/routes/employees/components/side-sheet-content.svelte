@@ -17,6 +17,9 @@
   import type AddContractDialogType from "./add-contract-dialog.svelte";
   import ContractCardActions from "./contract-card-actions.svelte";
   import DurationPreview from "./duration-preview.svelte";
+  import { buttonVariants } from "$lib/components/ui/button/index.js";
+  import * as Tooltip from "$lib/components/ui/tooltip/index.js";
+  import { UserPen } from "@lucide/svelte";
 
   const context = getEmployeeContext();
   /**Current Open Employee Context*/
@@ -110,6 +113,10 @@
     />
   {/await}
 
+  {#await import("./edit-employee-dialog.svelte") then { default: EditEmployeeDialog }}
+    <EditEmployeeDialog bind:open={sheetContext.editEmployeeState} />
+  {/await}
+
   <div class="text-lg max-[930px]:pt-4">
     {formatFullName(
       {
@@ -121,9 +128,29 @@
         order: "formal",
       }
     )}
+    <Tooltip.Provider>
+      <Tooltip.Root>
+        <Tooltip.Trigger
+          class={buttonVariants({
+            variant: "secondary",
+            class: "relative h-6 !px-1.5 text-muted-foreground translate-y-0.5",
+          })}
+          onclick={() => (sheetContext.editEmployeeState = true)}
+        >
+          <UserPen />
+          <span class="sr-only">edit</span>
+        </Tooltip.Trigger>
+        <Tooltip.Content>
+          <p>Edit Employee Info</p>
+        </Tooltip.Content>
+      </Tooltip.Root>
+    </Tooltip.Provider>
   </div>
 
-  <div class="text-muted-foreground">
+  <div
+    class="text-muted-foreground line-clamp-2 cursor-help"
+    title={emp.designation}
+  >
     {emp.designation}
   </div>
 
