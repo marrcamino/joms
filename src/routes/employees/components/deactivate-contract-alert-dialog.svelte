@@ -2,7 +2,10 @@
   import * as AlertDialog from "$lib/components/ui/alert-dialog/index.js";
   import { buttonVariants } from "$lib/components/ui/button";
   import { Spinner } from "$lib/components/ui/spinner";
-  import { getSideSheetContentContext } from "../context.svelte";
+  import {
+    getEmployeeContext,
+    getSideSheetContentContext,
+  } from "../context.svelte";
   import { updateContractStatus } from "./activate-contract-alert-dialog.svelte";
 
   interface Props {
@@ -10,7 +13,10 @@
   }
 
   let { open = $bindable(false) }: Props = $props();
+
   const sheetContext = getSideSheetContentContext();
+  const context = getEmployeeContext();
+
   let submitBtn = $state<HTMLButtonElement | null>(null);
   let isUpdating = $state(false);
 
@@ -24,6 +30,7 @@
         open = false;
         isUpdating = false;
         sheetContext.updateActiveContract(contract.contract_pk, false);
+        context.resetEmployeeDesignation(contract.employee_fk);
       });
     } finally {
       isUpdating = false;
@@ -63,7 +70,7 @@
         {#if isUpdating}
           <Spinner />
         {/if}
-        <span>Activate</span>
+        <span>Deactivate</span>
       </AlertDialog.Action>
     </AlertDialog.Footer>
   </AlertDialog.Content>

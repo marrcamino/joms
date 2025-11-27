@@ -2,8 +2,7 @@
   import { Button, buttonVariants } from "$lib/components/ui/button/index.js";
   import * as Dialog from "$lib/components/ui/dialog/index.js";
   import Spinner from "$lib/components/ui/spinner/spinner.svelte";
-  import { normalizeFormData } from "$lib/utils";
-  import { apiFetch } from "$lib/utils";
+  import { apiFetch, normalizeFormData } from "$lib/utils";
   import { toast } from "svelte-sonner";
   import {
     getEmployeeContext,
@@ -23,6 +22,7 @@
     positionCategoryFk: number;
     designation: string;
     rate: number;
+    remarks: string | null;
     isActive: 0 | 1;
   };
 
@@ -77,10 +77,19 @@
         rate: formData.rate,
         office_fk: formData.officePk,
         position_category_fk: formData.positionCategoryFk,
+        remarks: formData.remarks,
         is_active: formData.isActive,
       };
 
       toast.success("Successfully added");
+      if (formData.isActive) {
+        context.updateActiveStatus({
+          employee_pk: employeeId,
+          office_fk: formData.officePk,
+          designation: formData.designation,
+          is_active: formData.isActive,
+        });
+      }
       afterSave?.(newContract);
     } finally {
       isSaving = false;
@@ -95,7 +104,7 @@
     interactOutsideBehavior={isSaving ? "ignore" : "close"}
     disableCloseButton={isSaving}
   >
-    <form {onsubmit} class="grid gap-4 w-full" autocomplete="off">
+    <form {onsubmit} class="grid gap-4 w-full relative" autocomplete="off">
       <Dialog.Header>
         <Dialog.Title>Add New Contract</Dialog.Title>
         <Dialog.Description>
@@ -104,6 +113,7 @@
           >&rpar; are required.
         </Dialog.Description>
       </Dialog.Header>
+
       <ContractFormFields
         required
         asContentOnly
@@ -111,6 +121,7 @@
         hasActiveContract={sheetContent.hasActiveContract}
         employeeId={context.openEmployee?.employee_pk}
         bind:hadOverlap={hasOverlaps}
+        width="w-[429.53px]"
       />
       <Dialog.Footer>
         <Dialog.Close

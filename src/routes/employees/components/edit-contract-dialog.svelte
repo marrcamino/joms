@@ -14,7 +14,10 @@
   import { untrack } from "svelte";
   import { toast } from "svelte-sonner";
   import { fade, slide } from "svelte/transition";
-  import { getSideSheetContentContext } from "../context.svelte";
+  import {
+    getEmployeeContext,
+    getSideSheetContentContext,
+  } from "../context.svelte";
   import OverlapContracts from "../new/components/overlap-contracts.svelte";
 
   interface Props {
@@ -33,12 +36,15 @@
     officePk: number;
     positionCategoryFk: null | number;
     designation: string;
+    remarks: string | null;
     rate: number;
   };
 
   let { open = $bindable(false), afterUpdate }: Props = $props();
 
   const sheetContent = getSideSheetContentContext();
+  const context = getEmployeeContext();
+
   let isSaving = $state(false);
 
   // Form values
@@ -48,6 +54,7 @@
   let officePk = $state("");
   let positionCategPk = $state("");
   let positionTitle = $state("");
+  let remarks = $state("");
   let rate = $state("");
   let overlapContracts: Contract[] = $state([]);
   let hasOverlap = $state(false);
@@ -104,10 +111,21 @@
         rate: formData.rate,
         office_fk: formData.officePk,
         position_category_fk: formData.positionCategoryFk,
+        remarks: formData.remarks,
         is_active: sheetContent.selectedContract.is_active,
       };
 
       toast.success("Updated successfully");
+
+      if (sheetContent.selectedContract.is_active) {
+        context.setEmployeeDesignation({
+          employee_pk: sheetContent.selectedContract.employee_fk,
+          designation: formData.designation,
+          office_fk: formData.officePk,
+          is_active: 1,
+        });
+      }
+
       afterUpdate?.(updatedContract);
       open = false;
     } finally {
@@ -139,6 +157,7 @@
         selectedContract.position_category_fk ?? "null"
       )?.toString();
       positionTitle = selectedContract.designation;
+      remarks = selectedContract.remarks || "";
       rate = selectedContract.rate.toString();
     });
   });
@@ -268,7 +287,8 @@
                       id="designation"
                       name="designation"
                       required
-                      autoHeight={false}
+                      autoHeight
+                      autoTrim
                       bind:value={positionTitle}
                     />
                   </div>
@@ -287,6 +307,20 @@
                       min="100"
                       required
                       bind:value={rate}
+                    />
+                  </div>
+
+                  <div>
+                    <Label for="remarks" class="leading-6">
+                      <div>Remarks</div>
+                    </Label>
+
+                    <Textarea
+                      id="remarks"
+                      name="remarks"
+                      bind:value={remarks}
+                      autoHeight
+                      autoTrim
                     />
                   </div>
                 </div>

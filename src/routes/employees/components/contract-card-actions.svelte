@@ -1,18 +1,20 @@
 <script lang="ts">
+  import { dateHelper } from "$lib/components/date/date-helper";
   import { buttonVariants } from "$lib/components/ui/button";
   import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
+  import Spinner from "$lib/components/ui/spinner/spinner.svelte";
   import {
     CircleCheck,
-    CircleAlert,
     CircleX,
     EllipsisVertical,
-    Pencil,
+    FilePenLine,
     Trash2,
   } from "@lucide/svelte";
-  import { getSideSheetContentContext } from "../context.svelte";
+  import {
+    getEmployeeContext,
+    getSideSheetContentContext,
+  } from "../context.svelte";
   import { updateContractStatus } from "./activate-contract-alert-dialog.svelte";
-  import Spinner from "$lib/components/ui/spinner/spinner.svelte";
-  import { dateHelper } from "$lib/components/date/date-helper";
 
   interface Props {
     contract: Contract;
@@ -28,6 +30,7 @@
   );
 
   const sheetContext = getSideSheetContentContext();
+  const context = getEmployeeContext();
 
   async function activateContract() {
     sheetContext.selectedContract = contract;
@@ -47,6 +50,11 @@
         isActivating = false;
         open = false;
         sheetContext.updateActiveContract(contract.contract_pk);
+        context.setEmployeeDesignation({
+          employee_pk: contract.employee_fk,
+          designation: contract.designation,
+          office_fk: contract.office_fk,
+        });
       });
     } finally {
       isActivating = false;
@@ -65,7 +73,7 @@
     <EllipsisVertical />
     <span class="sr-only">open</span>
   </DropdownMenu.Trigger>
-  <DropdownMenu.Content align="end">
+  <DropdownMenu.Content align="end" class="w-[130px]">
     <DropdownMenu.Group>
       <DropdownMenu.Label>Manage Contract</DropdownMenu.Label>
       <DropdownMenu.Item
@@ -74,14 +82,14 @@
           sheetContext.editDialogState = true;
         }}
       >
-        <Pencil />
+        <FilePenLine />
         Edit
       </DropdownMenu.Item>
       <DropdownMenu.Item
         variant="destructive"
         onclick={() => {
           sheetContext.selectedContract = contract;
-          sheetContext.deleteAlertDialogState = true;
+          sheetContext.deleteContractAlertDialogState = true;
         }}
       >
         <Trash2 />

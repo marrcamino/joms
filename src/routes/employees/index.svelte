@@ -3,10 +3,14 @@
   import { Button } from "$lib/components/ui/button/index";
   import { UserRoundPlus } from "@lucide/svelte";
   import SideSheetContent from "./components/side-sheet-content.svelte";
-  import { getEmployeeContext } from "./context.svelte";
+  import {
+    getEmployeeContext,
+    setSideSheetContentContext,
+  } from "./context.svelte";
   import EmployeeTable from "./employee-table.svelte";
 
-  const context = getEmployeeContext();
+  getEmployeeContext();
+  const sheetContext = setSideSheetContentContext();
 </script>
 
 <svelte:head>
@@ -27,3 +31,13 @@
     <SideSheetContent />
   </div>
 </RouteContent>
+
+{#await import("./components/edit-employee-dialog.svelte") then { default: EditEmployeeDialog }}
+  <EditEmployeeDialog bind:open={sheetContext.editEmployeeState} />
+{/await}
+
+{#await import("./components/delete-employee-alert-dialog.svelte") then { default: DeleteEmployeeAlertDialog }}
+  <DeleteEmployeeAlertDialog
+    bind:open={sheetContext.deleteEmployeeAlertDialogState}
+  />
+{/await}

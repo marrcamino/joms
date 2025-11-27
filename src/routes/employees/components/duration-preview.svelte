@@ -7,26 +7,33 @@
 
   const sheetContext = getSideSheetContentContext();
   let { years, months, days } = $derived(sheetContext.counts);
+
+  let isDisable = $derived(sheetContext.contracts?.length === 0);
 </script>
 
 <div class="text-sm relative mr-auto inline">
   <div class="text-muted-foreground text-sm pl-1 leading-3.5">
     Length of Service
   </div>
-  <HoverCard.Root openDelay={100} closeDelay={0}>
+  <HoverCard.Root openDelay={100} closeDelay={0} disabled={isDisable}>
     <HoverCard.Trigger
-      class="relative cursor-default w-max flex items-center hover:*:data-border:border-foreground"
+      aria-disabled={isDisable}
+      class="group relative cursor-default w-max flex items-center hover:*:data-border:border-foreground"
     >
       <div
         data-border
-        class="border-b w-[95%] translate-x-1 absolute border-muted-foreground/80 bottom-[1px] border-dashed"
+        class="border-b w-[95%] group-aria-disabled:opacity-0 duration-300 transition-opacity translate-x-1 absolute border-muted-foreground/80 bottom-[1px] border-dashed"
       ></div>
-      <div class="ml-1 w-full">
-        <NumberFlow value={years} suffix={years > 1 ? "yrs" : "yr"} />
-        <NumberFlow value={months} suffix={months > 1 ? "mos" : "mo"} />
-        <NumberFlow value={days} suffix={days > 1 ? "days" : "day"} />
+      <div
+        class="ml-1 w-full group-aria-disabled:text-muted-foreground transition-colors"
+      >
+        <NumberFlow value={years} suffix="y" />
+        <NumberFlow value={months} suffix="m" />
+        <NumberFlow value={days} suffix="d" />
       </div>
-      <CircleQuestionMark class="inline size-3  text-muted-foreground ml-1" />
+      <CircleQuestionMark
+        class="inline size-3.5 group-aria-disabled:opacity-0 transition-opacity text-muted-foreground ml-1 duration-300"
+      />
     </HoverCard.Trigger>
     <HoverCard.Content class="w-full">
       <div class="place-self-center">
@@ -35,16 +42,19 @@
           <ArrowRight class="text-muted-foreground size-4" />
           <p>
             {formatDate(sheetContext.los.endDate)}
-            {#if sheetContext.los.endDate === nDate.getISOToday}
-              <span class="text-muted-foreground">&lpar;Today&rpar;</span>
-            {:else}
-              <span class="text-muted-foreground">&lpar;Ended&rpar;</span>
-            {/if}
+
+            <span class="text-muted-foreground font-normal">
+              {#if sheetContext.los.endDate === nDate.getISOToday}
+                &lpar;today&rpar;
+              {:else}
+                &lpar;ended&rpar;
+              {/if}
+            </span>
           </p>
         </div>
         {#if sheetContext.los.actualEndDate > nDate.getISOToday}
           <div class="text-sm text-muted-foreground">
-            <span>End by </span>
+            <span>Ends on </span>
             <span>{formatDate(sheetContext.los.actualEndDate)}</span>
           </div>
         {/if}

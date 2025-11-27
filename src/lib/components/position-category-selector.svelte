@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { Badge } from "$lib/components/ui/badge/index.js";
   import { Button } from "$lib/components/ui/button/index.js";
   import * as Command from "$lib/components/ui/command/index.js";
   import * as Popover from "$lib/components/ui/popover/index.js";
@@ -40,6 +39,7 @@
     return categories.find((f) => String(f.position_categ_pk) === value)
       ?.post_categ_name;
   });
+
   // We want to refocus the trigger button when the user selects
   // an item from the list so users can continue navigating the
   // rest of the form with the keyboard.
@@ -52,11 +52,8 @@
 
   onMount(async () => {
     if (!noDefaultValue) value = "null";
-
     const res = await apiFetch("/api/position-category");
-
     if (!res.ok) return;
-
     categories = (await res.json()) as PositionCategory[];
   });
 </script>
@@ -76,6 +73,7 @@
         aria-expanded={open}
         title={selectedValue}
         style="width: {width}px;"
+        data-has-value={value !== "null" ? "" : null}
       >
         <span class="truncate">
           {selectedValue || "Select office..."}

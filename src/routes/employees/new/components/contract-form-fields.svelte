@@ -25,6 +25,8 @@
     hasActiveContract?: boolean;
     hadOverlap?: boolean;
     employeeId?: number;
+    /** A tailwind class for setting selector's width*/
+    width?: string;
   }
 
   let {
@@ -35,6 +37,7 @@
     hasActiveContract,
     hadOverlap = $bindable(false),
     employeeId,
+    width = "w-[413.5px]",
   }: Props = $props();
   type OverlapResponse = {
     error: boolean;
@@ -53,7 +56,6 @@
 
   const now = today(getLocalTimeZone());
   const dataAsContent = asContentOnly ? "" : null;
-  const width = "w-[413.5px]";
 
   $effect(() => {
     endDateValue;
@@ -116,7 +118,7 @@
 
 <div
   data-as-content={dataAsContent}
-  class="py-4 shadow border px-4 rounded-xl bg-accent/10 space-y-4 data-[as-content]:mt-2 mt-6 relative data-[as-content]:rounded-none data-[as-content]:bg-background data-[as-content]:p-0 data-[as-content]:border-none"
+  class="py-4 shadow border data-[as-content]:shadow-none px-4 rounded-xl bg-accent/10 space-y-4 data-[as-content]:mt-2 mt-6 relative data-[as-content]:rounded-none data-[as-content]:bg-background data-[as-content]:p-0 data-[as-content]:border-none"
 >
   <div
     data-as-content={dataAsContent}
@@ -187,6 +189,8 @@
                 id="designation"
                 name="designation"
                 required={isItReallyRequired}
+                autoHeight
+                autoTrim
               />
             </div>
 
@@ -204,6 +208,13 @@
                 min="100"
                 required={isItReallyRequired}
               />
+            </div>
+
+            <div>
+              <Label for="remarks" class="leading-6">
+                <div>Remarks</div>
+              </Label>
+              <Textarea id="remarks" name="remarks" autoHeight autoTrim />
             </div>
 
             <div class="pt-2">
@@ -230,10 +241,14 @@
                   <div
                     aria-invalid={disableCheckbox ? "true" : undefined}
                     class="transition-colors aria-[invalid]:text-yellow-600 text-muted-foreground leading-5 mt-1"
+                    style="max-height: 42.5px; overflow: hidden;"
                   >
                     {#key errorMessage}
-                      <div transition:slide={{ axis: "y" }}>
-                        <div in:fade={{ delay: 300 }}>
+                      <div
+                        in:slide={{ axis: "y" }}
+                        out:slide={{ axis: "y", delay: 400 }}
+                      >
+                        <div in:fade={{ delay: 500 }} out:fade>
                           {errorMessage}
                         </div>
                       </div>

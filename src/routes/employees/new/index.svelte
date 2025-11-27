@@ -1,14 +1,14 @@
 <script lang="ts">
   import RouteContent from "$lib/components/route-content.svelte";
   import Button from "$lib/components/ui/button/button.svelte";
+  import { apiFetch, normalizeFormData } from "$lib/utils";
   import { ChevronLeft } from "@lucide/svelte";
-  import Form from "./components/form.svelte";
   import { toast } from "svelte-sonner";
-  import { apiFetch } from "$lib/utils";
-  import { normalizeFormData } from "$lib/utils";
   import { getEmployeeContext } from "../context.svelte";
+  import Form from "./components/form.svelte";
 
   const context = getEmployeeContext();
+  let scrollArea: HTMLElement | null = null;
 
   async function onsubmit(e: SubmitEvent) {
     e.preventDefault();
@@ -34,7 +34,18 @@
       employee: any;
     };
 
+    const lnameElement = document.getElementById("lname") as HTMLInputElement;
+    scrollToTop();
+    setTimeout(() => {
+      lnameElement?.focus();
+    }, 300);
+
     context.add(result.employee, result.hasContract);
+  }
+
+  function scrollToTop() {
+    const viewport = scrollArea?.querySelector("[data-scroll-area-viewport]");
+    viewport?.scrollTo({ top: 0, behavior: "smooth" });
   }
 </script>
 
@@ -42,7 +53,7 @@
   <title>New Employee</title>
 </svelte:head>
 
-<RouteContent>
+<RouteContent bind:scrollAreaRef={scrollArea}>
   {#snippet header()}
     <div>Add New Employee</div>
     <Button

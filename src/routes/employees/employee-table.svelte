@@ -74,7 +74,7 @@
   });
 </script>
 
-<div class="rounded-md border grow max-w-4xl w-full">
+<div class="rounded-md border min-w-0 w-full h-max">
   <Table.Root>
     <Table.Header>
       {#each table.getHeaderGroups() as headerGroup (headerGroup.id)}
@@ -99,10 +99,9 @@
       <NewAdded />
       {#each table.getRowModel().rows as row (row.id)}
         <Table.Row
-          data-id={context.openEmployee?.employee_pk}
-          data-idtwo={row.original.employee_pk}
           data-state={context.openEmployee?.employee_pk ===
             row.original.employee_pk && "selected"}
+          class="data-[state=selected]:bg-blue-600/20"
         >
           {#each row.getVisibleCells() as cell (cell.id)}
             <Table.Cell>

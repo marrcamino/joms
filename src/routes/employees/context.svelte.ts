@@ -2,6 +2,11 @@ import { apiFetch, createLOSCalculator } from "$lib/utils";
 import { getContext, setContext } from "svelte";
 import { MediaQuery } from "svelte/reactivity";
 
+type EmployeeWithUpdatedActiveStatus = Pick<
+  Employee,
+  "employee_pk" | "office_fk" | "designation" | "is_active"
+>;
+
 const EMPLOYEE_CONTEXT_KEY = Symbol("employeeContextKey");
 const SIDE_SHEET_CONTENT_CONTEXT_KEY = Symbol("sideSheetContentKey");
 
@@ -14,7 +19,7 @@ function createEmployeeContext() {
   let openEmployee: Employee | null = $state(null);
 
   async function initData() {
-    const res = await apiFetch("/api/employee");
+    const res = await apiFetch("/api/employee?is_active=all");
 
     if (!res.ok) return;
 
@@ -32,6 +37,79 @@ function createEmployeeContext() {
 
     employees = [...employees, employee];
     _origEmployees = [..._origEmployees, employee];
+  }
+
+  function updateEmpBasicInfo(
+    employee: Omit<Employee, "office_fk" | "designation" | "is_active">
+  ) {
+    let updated: Employee | null = null;
+
+    employees = employees.map((e) => {
+      if (e.employee_pk === employee.employee_pk) {
+        updated = { ...e, ...employee };
+        return updated;
+      }
+      return e;
+    });
+
+    return updated;
+  }
+
+  function remove(id: number) {
+    employees = employees.filter((e) => e.employee_pk !== id);
+  }
+
+  function updateActiveStatus<T extends EmployeeWithUpdatedActiveStatus>(
+    employee: T
+  ) {
+    let updatedEmployee: Employee | null = null;
+
+    employees = employees.map((e) => {
+      if (employee.employee_pk === e.employee_pk) {
+        updatedEmployee = { ...e, ...employee };
+        return updatedEmployee;
+      }
+      return e;
+    });
+    if (updatedEmployee) openEmployee = updatedEmployee;
+  }
+
+  function resetEmployeeDesignation(id: number) {
+    let updatedEmployee: Employee | null = null;
+
+    employees = employees.map((e) => {
+      if (id === e.employee_pk) {
+        updatedEmployee = {
+          ...e,
+          office_fk: null,
+          designation: null,
+          is_active: 0,
+        };
+        return updatedEmployee;
+      }
+      return e;
+    });
+    if (updatedEmployee) openEmployee = updatedEmployee;
+  }
+
+  function setEmployeeDesignation<
+    T extends Pick<Employee, "employee_pk" | "designation" | "office_fk">
+  >(emp: T) {
+    let updatedEmployee: Employee | null = null;
+
+    employees = employees.map((e) => {
+      if (emp.employee_pk === e.employee_pk) {
+        updatedEmployee = {
+          ...e,
+          office_fk: emp.office_fk,
+          designation: emp.designation,
+          is_active: 1,
+        };
+        return updatedEmployee;
+      }
+      return e;
+    });
+    if (updatedEmployee) openEmployee = updatedEmployee;
   }
 
   return {
@@ -66,6 +144,11 @@ function createEmployeeContext() {
 
     initData,
     add,
+    updateEmpBasicInfo,
+    remove,
+    updateActiveStatus,
+    resetEmployeeDesignation,
+    setEmployeeDesignation,
   };
 }
 
@@ -79,10 +162,11 @@ function createSideSheetContentContext() {
   let addDialogState = $state(false);
   let editDialogState = $state(false);
   let editEmployeeState = $state(false);
-  let deleteAlertDialogState = $state(false);
+  let deleteContractAlertDialogState = $state(false);
+  let deleteEmployeeAlertDialogState = $state(false);
   let activeContractAlertDialogState = $state(false);
   let deactiveContractAlertDialogState = $state(false);
-  let counts = $derived(los.calculate(contracts ?? []));
+  let counts = $derived(los.calculate(contracts));
 
   let isFetching = $state(false);
   let hasActiveContract = $derived(
@@ -94,6 +178,7 @@ function createSideSheetContentContext() {
     contracts = sortContractsByLatest(newList);
   }
 
+  /** Deletes the contract */
   async function remove(id: number) {
     if (!contracts) return;
     contracts = sortContractsByLatest(
@@ -173,8 +258,11 @@ function createSideSheetContentContext() {
     get editEmployeeState() {
       return editEmployeeState;
     },
-    get deleteAlertDialogState() {
-      return deleteAlertDialogState;
+    get deleteContractAlertDialogState() {
+      return deleteContractAlertDialogState;
+    },
+    get deleteEmployeeAlertDialogState() {
+      return deleteEmployeeAlertDialogState;
     },
     get isFetching() {
       return isFetching;
@@ -211,8 +299,11 @@ function createSideSheetContentContext() {
     set editEmployeeState(v: boolean) {
       editEmployeeState = v;
     },
-    set deleteAlertDialogState(v: boolean) {
-      deleteAlertDialogState = v;
+    set deleteContractAlertDialogState(v: boolean) {
+      deleteContractAlertDialogState = v;
+    },
+    set deleteEmployeeAlertDialogState(v: boolean) {
+      deleteEmployeeAlertDialogState = v;
     },
     set isFetching(v: boolean) {
       isFetching = v;

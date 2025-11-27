@@ -4,26 +4,37 @@
   import { Spinner } from "$lib/components/ui/spinner";
   import { apiFetch } from "$lib/utils";
   import { toast } from "svelte-sonner";
-  import { getSideSheetContentContext } from "../context.svelte";
+  import {
+    getEmployeeContext,
+    getSideSheetContentContext,
+  } from "../context.svelte";
 
   interface Props {
     open?: boolean;
-    afterDelete?: (id: number) => void;
   }
 
-  let { open = $bindable(false), afterDelete }: Props = $props();
+  let { open = $bindable(false) }: Props = $props();
   const sheetContext = getSideSheetContentContext();
+  const context = getEmployeeContext();
 
   let isDeleting = $state(false);
 
   async function onclick() {
     if (!sheetContext.selectedContract) return;
-    const id = sheetContext.selectedContract.contract_pk;
+    const { contract_pk, employee_fk, is_active } =
+      sheetContext.selectedContract;
     try {
       isDeleting = true;
-      const res = await apiFetch(`/api/contract?contract_pk=${id}`, {
-        method: "DELETE",
-      });
+      const res = await apiFetch(
+        `/api/employee/contract?contract_pk=${contract_pk}`,
+        {
+          method: "DELETE",
+          body: JSON.stringify({
+            employee_pk: sheetContext.selectedContract.employee_fk,
+            is_active: sheetContext.selectedContract.is_active,
+          }),
+        }
+      );
 
       if (!res.ok) {
         toast.error("Can't delete contract", {
@@ -34,7 +45,15 @@
       }
 
       open = false;
-      afterDelete?.(id);
+      sheetContext.remove(contract_pk);
+      if (is_active) {
+        context.updateActiveStatus({
+          employee_pk: employee_fk,
+          designation: null,
+          is_active: 0,
+          office_fk: null,
+        });
+      }
       isDeleting = false;
       toast.success("Contract deleted succesfully");
     } finally {

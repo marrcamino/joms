@@ -41,13 +41,18 @@
   import { apiFetch } from "$lib/utils";
   import { untrack } from "svelte";
   import { toast } from "svelte-sonner";
-  import { getSideSheetContentContext } from "../context.svelte";
+  import {
+    getEmployeeContext,
+    getSideSheetContentContext,
+  } from "../context.svelte";
   interface Props {
     open?: boolean;
   }
 
   let { open = $bindable(false) }: Props = $props();
   const sheetContext = getSideSheetContentContext();
+  const context = getEmployeeContext();
+
   let submitBtn = $state<HTMLButtonElement | null>(null);
   let isUpdating = $state(false);
   let contractEnded = $state(false);
@@ -66,6 +71,11 @@
         open = false;
         isUpdating = false;
         sheetContext.updateActiveContract(contract.contract_pk);
+        context.setEmployeeDesignation({
+          employee_pk: contract.employee_fk,
+          designation: contract.designation,
+          office_fk: contract.office_fk,
+        });
       });
     } finally {
       isUpdating = false;

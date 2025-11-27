@@ -11,8 +11,14 @@
           "bg-secondary text-secondary-foreground [a&]:hover:bg-secondary/90 border-transparent",
         destructive:
           "bg-destructive [a&]:hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/70 border-transparent text-white",
+        constructive:
+          "bg-green-600 [a&]:hover:bg-green-600/90 focus-visible:ring-green-600/20 dark:focus-visible:ring-green-600/40 dark:bg-green-600/70 border-transparent text-white",
         outline:
           "text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground",
+        "outline-destructive":
+          "text-foreground border-destructive/80 bg-destructive/15 [a&]:hover:bg-destructive [a&]:hover:text-accent-foreground",
+        "outline-constructive":
+          "text-foreground border-green-600/80 bg-green-600/20 [a&]:hover:bg-green-600 [a&]:hover:text-accent-foreground",
       },
     },
     defaultVariants: {

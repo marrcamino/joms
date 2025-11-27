@@ -9,7 +9,7 @@ try {
   $order = strtoupper($_GET['order'] ?? 'ASC'); // ASC or DESC
   $limit = (int)($_GET['limit'] ?? 20); // default 20 rows
   $offset = (int)($_GET['offset'] ?? 0); // default offset 0
-  $is_active_param = $_GET['is_active'] ?? '1'; // default "1"
+  $is_active_param = $_GET['is_active'] ?? '1'; // default "1" can be all
 
   // Allow only certain columns to sort by (avoid SQL injection)
   $allowedSort = ['employee_pk', 'firstname', 'lastname', 'birthday'];

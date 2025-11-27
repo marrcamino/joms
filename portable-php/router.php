@@ -28,9 +28,11 @@ $routes = [
   ],
   'PATCH' => [
     '/api/contract/set-active' => 'htdocs/api/contract/set-active.php',
+    '/api/employee/update' => 'htdocs/api/employee/update.php',
   ],
   'DELETE' => [
-    '/api/contract' => 'htdocs/api/contract/delete.php',
+    '/api/employee/contract' => 'htdocs/api/employee/contract/delete.php',
+    '/api/employee' => 'htdocs/api/employee/delete.php',
   ],
 ];
 

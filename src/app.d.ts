@@ -25,6 +25,7 @@ declare global {
     office_fk: Office["office_pk"] | null;
     /** `null` means not active */
     designation: string | null;
+    /** `1` if they have an active contract, otherwise `0` */
     is_active: 0 | 1;
   }
 
@@ -42,6 +43,7 @@ declare global {
     rate: number;
     office_fk: Office["office_pk"];
     position_category_fk: PositionCategory["position_categ_pk"] | null;
+    remarks: string | null;
     is_active: 0 | 1;
   }
 }

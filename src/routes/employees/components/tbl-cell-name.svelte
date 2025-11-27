@@ -11,23 +11,25 @@
 
   let { lastname, firstname, middlename, extension }: Props = $props();
 
-  const fullname = formatFullName(
-    {
-      lastName: lastname,
-      firstName: firstname,
-      middleName: middlename,
-      nameExtension: extension,
-    },
-    {
-      order: "lastname",
-    }
+  const fullname = $derived(
+    formatFullName(
+      {
+        lastName: lastname,
+        firstName: firstname,
+        middleName: middlename,
+        extension: extension,
+      },
+      {
+        order: "formal",
+      }
+    )
   );
 </script>
 
 <div>
   <span> {fullname}</span>
 
-  <Tooltip.Provider>
+  <!-- <Tooltip.Provider>
     <Tooltip.Root>
       <Tooltip.Trigger>
         <div class="relative inline-flex size-2.5 ml-1">
@@ -39,7 +41,7 @@
         <p>Add to library</p>
       </Tooltip.Content>
     </Tooltip.Root>
-  </Tooltip.Provider>
+  </Tooltip.Provider> -->
 </div>
 
 {#snippet warning(absolute = false)}

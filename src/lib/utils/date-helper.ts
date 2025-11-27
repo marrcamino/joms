@@ -1,4 +1,5 @@
 import {
+  CalendarDate,
   getLocalTimeZone,
   today,
   type DateValue,
@@ -60,6 +61,11 @@ export const cDate = {
   get getYesterday(): DateValue {
     const now = today(getLocalTimeZone());
     return now.subtract({ days: 1 });
+  },
+
+  toDateValue(date: string): DateValue {
+    const [years, month, day] = nDate.parseDateParts(date);
+    return new CalendarDate(years, month, day);
   },
 };
 

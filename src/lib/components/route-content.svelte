@@ -9,12 +9,14 @@
     noScrollArea?: boolean;
     /** This must be a valid CSS height value, e.g. `100vh`, `100dvh - 6.5rem`, etc. */
     contentHeight?: string;
+    scrollAreaRef?: HTMLElement | null;
     children: Snippet;
   }
 
   let {
     header,
     noScrollArea,
+    scrollAreaRef = $bindable(null),
     contentHeight = "100dvh - 3rem",
     children,
   }: Props = $props();
@@ -43,6 +45,7 @@
       </div>
     {:else}
       <ScrollArea
+        bind:ref={scrollAreaRef}
         style="height: calc({contentHeight});"
         orientation="both"
         scrollbarXClasses="[&_[data-scroll-area-thumb]]:bg-muted-foreground/60"

@@ -2,28 +2,24 @@
   import { Badge } from "$lib/components/ui/badge/index.js";
   import { Button } from "$lib/components/ui/button";
   import * as Empty from "$lib/components/ui/empty/index.js";
-  import * as Item from "$lib/components/ui/item/index.js";
   import { ScrollArea } from "$lib/components/ui/scroll-area/index.js";
   import * as Sheet from "$lib/components/ui/sheet/index.js";
   import { Skeleton } from "$lib/components/ui/skeleton/index.js";
-  import { formatDate, formatFullName } from "$lib/utils";
-  import { ArrowRight, FileX2Icon, Plus } from "@lucide/svelte";
+  import { formatFullName } from "$lib/utils";
+  import { FileX2Icon } from "@lucide/svelte";
   import { onMount, untrack } from "svelte";
   import {
     getEmployeeContext,
-    setSideSheetContentContext,
+    getSideSheetContentContext,
     sheetIsVisible,
   } from "../context.svelte";
   import type AddContractDialogType from "./add-contract-dialog.svelte";
-  import ContractCardActions from "./contract-card-actions.svelte";
   import DurationPreview from "./duration-preview.svelte";
-  import { buttonVariants } from "$lib/components/ui/button/index.js";
-  import * as Tooltip from "$lib/components/ui/tooltip/index.js";
-  import { UserPen } from "@lucide/svelte";
+  import RecordItem from "./record-item.svelte";
 
   const context = getEmployeeContext();
   /**Current Open Employee Context*/
-  const sheetContext = setSideSheetContentContext();
+  const sheetContext = getSideSheetContentContext();
 
   let refetching = $state(false);
 
@@ -94,10 +90,9 @@
     />
   {/await}
 
-  {#await import("./delete-alert-dialog.svelte") then { default: DeleteAlertDialog }}
+  {#await import("./delete-contract-alert-dialog.svelte") then { default: DeleteAlertDialog }}
     <DeleteAlertDialog
-      bind:open={sheetContext.deleteAlertDialogState}
-      afterDelete={(id) => sheetContext.remove(id)}
+      bind:open={sheetContext.deleteContractAlertDialogState}
     />
   {/await}
 
@@ -113,45 +108,30 @@
     />
   {/await}
 
-  {#await import("./edit-employee-dialog.svelte") then { default: EditEmployeeDialog }}
-    <EditEmployeeDialog bind:open={sheetContext.editEmployeeState} />
-  {/await}
-
   <div class="text-lg max-[930px]:pt-4">
     {formatFullName(
       {
         lastName: emp.lastname,
         firstName: emp.firstname,
         middleName: emp.middlename,
+        extension: emp.extension,
       },
-      {
-        order: "formal",
-      }
+      { order: "formal" }
     )}
-    <Tooltip.Provider>
-      <Tooltip.Root>
-        <Tooltip.Trigger
-          class={buttonVariants({
-            variant: "secondary",
-            class: "relative h-6 !px-1.5 text-muted-foreground translate-y-0.5",
-          })}
-          onclick={() => (sheetContext.editEmployeeState = true)}
-        >
-          <UserPen />
-          <span class="sr-only">edit</span>
-        </Tooltip.Trigger>
-        <Tooltip.Content>
-          <p>Edit Employee Info</p>
-        </Tooltip.Content>
-      </Tooltip.Root>
-    </Tooltip.Provider>
   </div>
 
-  <div
-    class="text-muted-foreground line-clamp-2 cursor-help"
-    title={emp.designation}
-  >
-    {emp.designation}
+  <div style="min-height: 25.5px;">
+    {#if emp.designation}
+      <div
+        class="text-muted-foreground w-max cursor-help leading-5 hover:text-foreground/70"
+        title={emp.designation}
+        style="width: 347px;"
+      >
+        {emp.designation}
+      </div>
+    {:else}
+      <Badge variant="outline-destructive">Inactive</Badge>
+    {/if}
   </div>
 
   <div class="pb-2 pt-4 flex items-center">
@@ -172,28 +152,7 @@
   >
     {#if sheetContext}
       {#each sheetContext.contracts as contract (contract.contract_pk)}
-        <Item.Root variant="muted">
-          <Item.Content>
-            <Item.Title class="w-full ">
-              <p class="flex items-center gap-1">
-                <span>{formatDate(contract.start_date)}</span>
-                <ArrowRight class="size-4 text-muted-foreground" />
-                <span>{formatDate(contract.end_date)}</span>
-              </p>
-
-              {#if contract.is_active}
-                <Badge class="px-2 bg-green-600 text-white" variant="secondary">
-                  Active
-                </Badge>
-              {/if}
-
-              <ContractCardActions {contract} />
-            </Item.Title>
-            <Item.Description class="text-wrap">
-              {contract.designation}
-            </Item.Description>
-          </Item.Content>
-        </Item.Root>
+        <RecordItem {contract} />
       {:else}
         <Empty.Root class="bg-muted/50 to-background h-full from-30%">
           <Empty.Header>
@@ -205,19 +164,10 @@
               This Job Order employee doesn’t have an active contract yet. You
               can add one below
             </Empty.Description>
+            <Empty.Content>
+              <Button size="sm">Add Contract</Button>
+            </Empty.Content>
           </Empty.Header>
-          <Empty.Content>
-            <Button
-              variant="outline"
-              size="sm"
-              type="button"
-              disabled={!AddContractDialog}
-              onclick={() => (sheetContext.addDialogState = true)}
-            >
-              <Plus />
-              Add Contract
-            </Button>
-          </Empty.Content>
         </Empty.Root>
       {/each}
     {:else}

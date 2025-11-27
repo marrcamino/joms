@@ -96,8 +96,12 @@ export function createLOSCalculator() {
   let endDate = dateHelper.getISOToday;
   let actualEndDate = dateHelper.getISOToday;
 
-  function calculate(contracts: ContractBase[], includeToday = true) {
-    if (!contracts.length) return counts;
+  /** Counts will reset if contracts is `undefined` or `null` */
+  function calculate(contracts?: ContractBase[] | null, includeToday = true) {
+    if (!contracts || !contracts.length) {
+      counts = { years: 0, months: 0, days: 0 };
+      return counts;
+    }
 
     contracts = sortContractsByStartDate(contracts);
     contracts = getStableRange(contracts);

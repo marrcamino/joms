@@ -24,6 +24,7 @@ try {
 
   // Step 2: Check for full duplicate in PHP
   $duplicate = false;
+  $duplicateEmployee = null;
   foreach ($employees as $e) {
     $sameFirst = strtolower(trim($e['firstname'])) === $fname;
     $sameMiddle = strtolower(trim($e['middlename'] ?? '')) === $mname;
@@ -31,12 +32,14 @@ try {
 
     if ($sameFirst && $sameMiddle && $sameExt) {
       $duplicate = true;
+      $duplicateEmployee = $e;
       break;
     }
   }
 
   echo json_encode([
     'duplicate' => $duplicate,
+    'employee' => $duplicateEmployee,
     'message' => $duplicate
       ? 'Employee already exists.'
       : 'No duplicate found.'

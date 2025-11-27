@@ -1,3 +1,16 @@
+<script module lang="ts">
+  export type BasicInformationObjectFormData = {
+    lname: string;
+    fname: string;
+    mname: null | string;
+    extension: null;
+    sex: null | 0 | 1;
+    birthday: null | string;
+    email: null | string;
+    address: null | string;
+  };
+</script>
+
 <script lang="ts">
   import { dateHelper } from "$lib/components/date/date-helper";
   import DatePicker from "$lib/components/date/date-picker.svelte";
@@ -11,8 +24,9 @@
   import * as Select from "$lib/components/ui/select/index.js";
   import { Textarea } from "$lib/components/ui/textarea/index.js";
   import { SEX_COLOR_MAP, SEX_ICON_MAP, SEX_MAP } from "$lib/constants";
-  import { apiFetch, mapToOptions } from "$lib/utils";
-  import { CircleAlert, Lightbulb } from "@lucide/svelte";
+  import { apiFetch, cDate, mapToOptions } from "$lib/utils";
+  import type { DateValue } from "@internationalized/date";
+  import { CircleAlert, Lightbulb, Minus } from "@lucide/svelte";
   import { useDebounce } from "runed";
   import { untrack } from "svelte";
   import { cubicIn, cubicOut } from "svelte/easing";
@@ -20,19 +34,31 @@
 
   interface Props {
     contractIsRequired?: boolean;
+    asContent?: boolean;
+    employee?: Employee | null;
+    hasDuplicate?: boolean;
   }
 
-  let { contractIsRequired = $bindable() }: Props = $props();
+  let {
+    contractIsRequired = $bindable(),
+    hasDuplicate = $bindable(false),
+    asContent,
+    employee,
+  }: Props = $props();
 
   const sexList = mapToOptions(SEX_MAP);
   const TIP_KEY = "clipboard_tip_hidden";
+  const content = asContent ? "" : null;
 
   let sexValue = $state("");
   let lname = $state("");
   let fname = $state("");
   let mname = $state("");
   let extension = $state("");
-  let hasDuplicate = $state(false);
+  let email = $state("");
+  let address = $state("");
+  let birthday: DateValue | undefined = $state();
+
   let showTip = $state(false);
 
   $effect(() => {
@@ -41,6 +67,23 @@
 
     untrack(() => {
       contractIsRequired = lname.trim() !== "" && fname.trim() !== "";
+    });
+  });
+
+  $effect(() => {
+    employee;
+    untrack(() => {
+      if (!employee) return;
+      lname = employee.lastname;
+      fname = employee.firstname;
+      mname = employee.middlename ?? "";
+      extension = employee.extension ?? "";
+      email = employee.email ?? "";
+      address = employee.address ?? "";
+      sexValue = employee.sex;
+      if (employee.birthday) {
+        birthday = cDate.toDateValue(employee.birthday);
+      }
     });
   });
 
@@ -64,9 +107,14 @@
 
         const data = (await res.json()) as {
           duplicate: boolean;
-          message: string;
+          employee: Employee | null;
         };
-        hasDuplicate = data.duplicate;
+
+        if (employee && data.employee) {
+          hasDuplicate =
+            data.employee.employee_pk !== employee.employee_pk &&
+            data.duplicate;
+        } else hasDuplicate = data.duplicate;
       });
     },
     () => 500
@@ -105,10 +153,11 @@
 </script>
 
 <div
-  class="py-4 shadow border px-4 rounded-xl bg-accent/10 space-y-4 mt-6 relative"
+  data-content={content}
+  class="[&:not([data-content])]:py-4 [&:not([data-content])]:shadow [&:not([data-content])]:px-4 [&:not([data-content])]:rounded-xl [&:not([data-content])]:bg-accent/10 space-y-4 [&:not([data-content])]:mt-6 mt-2 relative [&:not([data-content])]:border"
 >
   <div class="grid gap-2 [&_label]:leading-6">
-    <div class="pb-2">
+    <div data-content={content} class="pb-2 data-[content]:hidden">
       <div class="text-lg uppercase">Basic Information</div>
       <div class="text-sm text-muted-foreground">
         All required fields are marked with asterisk
@@ -224,7 +273,11 @@
               </Select.Trigger>
               <Select.Content>
                 <Select.Group>
-                  <Select.Label>Sex</Select.Label>
+                  <Select.Label>Select Sex</Select.Label>
+                  <Select.Item value="">
+                    <Minus />
+                    Unspecified
+                  </Select.Item>
                   {#each sexList as sex (sex.value)}
                     {@const key = Number(sex.value) as 1 | 2}
                     {@const Icon = SEX_ICON_MAP[key]}
@@ -248,6 +301,7 @@
               name="birthday"
               maxDate={dateHelper.getMinimumBirthDate}
               placeholder={dateHelper.getMinimumBirthDate}
+              bind:value={birthday}
               onOpenChangeComplete={(open) => {
                 if (open) checkClipboardPermission();
               }}
@@ -299,12 +353,18 @@
 
     <div>
       <Label for="email">Email</Label>
-      <Input id="email" name="email" type="email" />
+      <Input id="email" name="email" type="email" bind:value={email} />
     </div>
 
     <div>
       <Label for="address">Address</Label>
-      <Textarea id="address" name="address" autoHeight autoTrim />
+      <Textarea
+        autoTrim
+        autoHeight
+        id="address"
+        name="address"
+        bind:value={address}
+      />
     </div>
   </div>
 </div>
