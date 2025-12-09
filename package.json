@@ -33,6 +33,7 @@
   "dependencies": {
     "@number-flow/svelte": "^0.3.9",
     "runed": "^0.35.0",
-    "svelte-spa-router": "^4.0.1"
+    "svelte-spa-router": "^4.0.1",
+    "uuid": "^13.0.0"
   }
 }

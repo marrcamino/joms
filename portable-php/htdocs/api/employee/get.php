@@ -4,6 +4,18 @@ require_once __DIR__ . '/../helpers.php';
 try {
   $db = getDatabase();
 
+
+  if (isset($_GET['employee_pk']) && !empty($_GET['employee_pk'])) {
+    $employee_pk = $_GET['employee_pk'];
+    $stmt0 = $db->prepare('SELECT * FROM employee WHERE employee_pk = :employee_pk LIMIT 1');
+    $stmt0->bindValue(':employee_pk', $employee_pk, PDO::PARAM_INT);
+    $stmt0->execute();
+    $singleEmployee = $stmt0->fetch(PDO::FETCH_ASSOC);
+
+    echo json_encode($singleEmployee);
+    exit;
+  }
+
   // Get query parameters
   $sort = $_GET['sort'] ?? 'employee_pk'; // default sort column
   $order = strtoupper($_GET['order'] ?? 'ASC'); // ASC or DESC

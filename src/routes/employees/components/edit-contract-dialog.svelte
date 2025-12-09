@@ -9,7 +9,7 @@
   import { Label } from "$lib/components/ui/label";
   import Spinner from "$lib/components/ui/spinner/spinner.svelte";
   import { Textarea } from "$lib/components/ui/textarea";
-  import { apiFetch, normalizeFormData } from "$lib/utils";
+  import { apiFetch, nDate, normalizeFormData } from "$lib/utils";
   import { type DateValue, CalendarDate } from "@internationalized/date";
   import { untrack } from "svelte";
   import { toast } from "svelte-sonner";
@@ -113,6 +113,7 @@
         position_category_fk: formData.positionCategoryFk,
         remarks: formData.remarks,
         is_active: sheetContent.selectedContract.is_active,
+        created_at: nDate.getCurrentTimestamp,
       };
 
       toast.success("Updated successfully");

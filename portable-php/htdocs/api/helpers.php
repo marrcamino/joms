@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Helper functions for the API
  */
@@ -82,4 +84,34 @@ function getOverlappingContracts(PDO $db, int $employeeId, string $startDate, st
   $stmt->execute();
 
   return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+
+
+/**
+ * Checks if there is `no value` or `unset`.
+ *
+ * Accepts either a raw value (`null`, `''`, etc.) **or** an array with a key.
+ * Numeric `0` and string `'0'` are considered valid.
+ *
+ * @param mixed $valueOrArray Either a single value to check, or an array to check against
+ * @param string|null $key Optional. If $valueOrArray is an array, the key to check
+ * @return bool True if missing, false otherwise
+ *
+ * @example
+ * is_missing('');                  // true
+ * is_missing(0);                   // false
+ * is_missing($_GET, 'office_pk');  // true if not set
+ */
+function is_missing(mixed $valueOrArray, ?string $key = null): bool
+{
+
+  if (is_array($valueOrArray)) {
+    if ($key === null || trim($key) === '') return false;
+    $value = $valueOrArray[$key] ?? null;
+    return $value === null || trim($value) === '';
+  }
+
+  // simple value check
+  return $valueOrArray === null || $valueOrArray === '';
 }

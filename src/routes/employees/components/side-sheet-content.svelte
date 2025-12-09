@@ -165,7 +165,11 @@
               can add one below
             </Empty.Description>
             <Empty.Content>
-              <Button size="sm">Add Contract</Button>
+              <Button
+                size="sm"
+                onclick={() => (sheetContext.addDialogState = true)}
+                >Add Contract</Button
+              >
             </Empty.Content>
           </Empty.Header>
         </Empty.Root>
