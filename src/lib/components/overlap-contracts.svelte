@@ -7,21 +7,20 @@
 
   interface Props {
     contracts: Contract[];
-    startDateValue: DateValue | undefined;
-    endDateValue: DateValue | undefined;
+    sourceType?: Exclude<ContractSourceType, "pds">;
   }
 
-  let { contracts }: Props = $props();
+  let { contracts, sourceType = "contract" }: Props = $props();
   let plural = $derived(contracts.length === 1 ? "" : "s");
 </script>
 
 <div>
-  <Alert.Root class="text-yellow-600">
+  <Alert.Root variant="danger">
     <CircleAlert />
-    <Alert.Title>Conflicting contract{plural} found</Alert.Title>
+    <Alert.Title>Conflicting {sourceType}{plural} found</Alert.Title>
 
-    <Alert.Description class="text-yellow-600/70  "
-      >These contract{plural} overlap your selected dates.</Alert.Description
+    <Alert.Description
+      >These {sourceType}{plural} overlap your selected dates.</Alert.Description
     >
   </Alert.Root>
   <ScrollArea

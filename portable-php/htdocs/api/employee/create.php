@@ -53,17 +53,19 @@ try {
       )
   ");
 
+  $isActive = (int)$input['isActive'];
+
   $stmt->bindValue(':firstname', $input['fname']);
   $stmt->bindValue(':lastname', $input['lname']);
-  $stmt->bindValue(':middlename', $input['mname'], pdoParamNullable($input['mname']));
-  $stmt->bindValue(':extension', $input['extension'], pdoParamNullable($input['extension']));
-  $stmt->bindValue(':sex', $input['sex'],  pdoParamNullable($input['sex'], PDO::PARAM_INT));
-  $stmt->bindValue(':birthday', $input['birthday'], pdoParamNullable($input['birthday']));
-  $stmt->bindValue(':address', $input['address'], pdoParamNullable($input['address']));
-  $stmt->bindValue(':email', $input['email'], pdoParamNullable($input['email']));
-  $stmt->bindValue(':is_active', $hasContract ? 1 : 0, PDO::PARAM_INT);
-  $stmt->bindValue(':office_fk', $hasContract ? (int)$input['officePk'] : null, pdoParamNullable($input['officePk'], PDO::PARAM_INT));
-  $stmt->bindValue(':designation', $hasContract ? $input['designation'] : null, pdoParamNullable($input['designation']));
+  $stmt->bindValue(':middlename', $input['mname']);
+  $stmt->bindValue(':extension', $input['extension']);
+  $stmt->bindValue(':sex', $input['sex']);
+  $stmt->bindValue(':birthday', $input['birthday']);
+  $stmt->bindValue(':address', $input['address']);
+  $stmt->bindValue(':email', $input['email']);
+  $stmt->bindValue(':is_active', $isActive, PDO::PARAM_INT);
+  $stmt->bindValue(':office_fk', $isActive ? (int)$input['officePk'] : null);
+  $stmt->bindValue(':designation', $isActive ? $input['designation'] : null);
 
   $stmt->execute();
 
@@ -85,11 +87,7 @@ try {
     $contractStmt->bindValue(':designation', $input['designation']);
     $contractStmt->bindValue(':rate', (int)$input['rate']);
     $contractStmt->bindValue(':office_fk', (int)$input['officePk'], PDO::PARAM_INT);
-    $contractStmt->bindValue(
-      ':position_category_fk',
-      $input['positionCategoryFk'],
-      pdoParamNullable($input['positionCategoryFk'], PDO::PARAM_INT)
-    );
+    $contractStmt->bindValue(':position_category_fk', $input['positionCategoryFk']);
 
     $contractStmt->execute();
   }

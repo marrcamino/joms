@@ -1,12 +1,22 @@
 import Home from "$routes/home.svelte";
+import OfficeRoute from "$routes/offices/index.svelte";
 import NewEmployee from "$routes/employees/new/index.svelte";
-import { House, Users, type IconProps } from "@lucide/svelte/icons";
+import Test from "$routes/test/index.svelte";
+import {
+  House,
+  Users,
+  Building,
+  TestTubeDiagonal,
+  type IconProps,
+} from "@lucide/svelte/icons";
 import { type Component } from "svelte";
 import {
   wrap as oldWrap,
   type WrapOptions as OldWrapOptions,
 } from "svelte-spa-router/wrap";
 import { type WrappedComponent as OldWrappedComponent } from "svelte-spa-router";
+import NotFound from "./components/not-found.svelte";
+import OfficeView from "$routes/offices/[office_id]/index.svelte";
 
 // route type
 type ROUTES_MAP = VisibleInNavigation | HiddenInNavigation;
@@ -50,6 +60,7 @@ export const ROUTES: ROUTES_MAP[] = [
     icon: House,
     page: Home,
   },
+
   {
     title: "Employees",
     url: "#/employees",
@@ -60,7 +71,31 @@ export const ROUTES: ROUTES_MAP[] = [
   },
 
   {
+    title: "Offices",
+    url: "#/offices",
+    icon: Building,
+    page: OfficeRoute,
+  },
+
+  {
+    url: "#/offices/*",
+    page: wrap({
+      asyncComponent: () => import("$routes/offices/[office_id]/index.svelte"),
+    }),
+  },
+  {
+    title: "Test",
+    url: "#/test",
+    icon: TestTubeDiagonal,
+    page: Test,
+  },
+
+  {
     url: "#/employees/new",
     page: NewEmployee,
+  },
+  {
+    url: "*",
+    page: NotFound,
   },
 ] as const;

@@ -2,7 +2,7 @@
   import { Button, buttonVariants } from "$lib/components/ui/button/index.js";
   import * as Dialog from "$lib/components/ui/dialog/index.js";
   import Spinner from "$lib/components/ui/spinner/spinner.svelte";
-  import { apiFetch, normalizeFormData } from "$lib/utils";
+  import { apiFetch, nDate, normalizeFormData } from "$lib/utils";
   import { toast } from "svelte-sonner";
   import {
     getEmployeeContext,
@@ -51,7 +51,7 @@
       if (!formData.startDate) return;
       isSaving = true;
       const res = await apiFetch(
-        `/api/employee/contract?employee_id=${employeeId}`,
+        `/api/employee/contract?employee_pk=${employeeId}`,
         {
           method: "POST",
           body: JSON.stringify(formData),
@@ -79,6 +79,9 @@
         position_category_fk: formData.positionCategoryFk,
         remarks: formData.remarks,
         is_active: formData.isActive,
+        created_at: nDate.getCurrentTimestamp,
+        source_type: "contract",
+        transmittal_item_fk: null,
       };
 
       toast.success("Successfully added");

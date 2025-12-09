@@ -9,7 +9,7 @@
   import { Label } from "$lib/components/ui/label";
   import Spinner from "$lib/components/ui/spinner/spinner.svelte";
   import { Textarea } from "$lib/components/ui/textarea";
-  import { apiFetch, normalizeFormData } from "$lib/utils";
+  import { apiFetch, nDate, normalizeFormData } from "$lib/utils";
   import { type DateValue, CalendarDate } from "@internationalized/date";
   import { untrack } from "svelte";
   import { toast } from "svelte-sonner";
@@ -18,7 +18,7 @@
     getEmployeeContext,
     getSideSheetContentContext,
   } from "../context.svelte";
-  import OverlapContracts from "../new/components/overlap-contracts.svelte";
+  import OverlappingContractsDisplay from "../../../lib/components/overlapping-contracts-display.svelte";
 
   interface Props {
     open?: boolean;
@@ -102,7 +102,7 @@
         return;
       }
 
-      const updatedContract = {
+      const updatedContract: Contract = {
         contract_pk,
         employee_fk: sheetContent.selectedContract.employee_fk,
         start_date: formData.startDate,
@@ -113,6 +113,9 @@
         position_category_fk: formData.positionCategoryFk,
         remarks: formData.remarks,
         is_active: sheetContent.selectedContract.is_active,
+        created_at: nDate.getCurrentTimestamp,
+        source_type: "contract",
+        transmittal_item_fk: null,
       };
 
       toast.success("Updated successfully");
@@ -238,7 +241,7 @@
           {#if overlapContracts.length}
             <div transition:slide={{ axis: "y", delay: 300 }}>
               <div in:fade={{ delay: 400 }} out:fade>
-                <OverlapContracts
+                <OverlappingContractsDisplay
                   contracts={overlapContracts}
                   {startDateValue}
                   {endDateValue}

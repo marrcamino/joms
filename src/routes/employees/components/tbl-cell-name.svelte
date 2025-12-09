@@ -12,17 +12,12 @@
   let { lastname, firstname, middlename, extension }: Props = $props();
 
   const fullname = $derived(
-    formatFullName(
-      {
-        lastName: lastname,
-        firstName: firstname,
-        middleName: middlename,
-        extension: extension,
-      },
-      {
-        order: "formal",
-      }
-    )
+    formatFullName({
+      lastname,
+      firstname,
+      middlename,
+      extension,
+    })
   );
 </script>
 

@@ -5,60 +5,60 @@
   export const mockNames = [
     // Simple name
     {
-      firstName: "Juan",
-      lastName: "Dela Cruz",
+      firstname: "Juan",
+      lastname: "Dela Cruz",
     },
 
     // With middle name
     {
-      firstName: "Maria",
-      middleName: "Reyes",
-      lastName: "Santos",
+      firstname: "Maria",
+      middlename: "Reyes",
+      lastname: "Santos",
     },
 
     // With prefix
     {
       prefix: "Dr.",
-      firstName: "Jose",
-      lastName: "Rizal",
+      firstname: "Jose",
+      lastname: "Rizal",
     },
 
     // With multiple prefixes
     {
       prefix: "Atty., Dr.",
-      firstName: "Elena",
-      middleName: "Ramos",
-      lastName: "Cruz",
+      firstname: "Elena",
+      middlename: "Ramos",
+      lastname: "Cruz",
     },
 
     // With extension (generational)
     {
-      firstName: "Pedro",
-      lastName: "Santos",
+      firstname: "Pedro",
+      lastname: "Santos",
       extension: "Jr",
     },
 
     // With numeric extension
     {
-      firstName: "Roberto",
-      middleName: "Lopez",
-      lastName: "Garcia",
+      firstname: "Roberto",
+      middlename: "Lopez",
+      lastname: "Garcia",
       extension: "III",
     },
 
     // With suffix (professional titles)
     {
-      firstName: "Cynthia",
-      lastName: "Bautista",
+      firstname: "Cynthia",
+      lastname: "Bautista",
       suffix: "CPA, MBA",
     },
 
     // With prefix + extension + suffix
     {
       prefix: "Engr.",
-      firstName: "Ramon",
-      middleName: "Villanueva",
-      lastName: "Reyes",
+      firstname: "Ramon",
+      middlename: "Villanueva",
+      lastname: "Reyes",
       extension: "Sr",
       suffix: "PE, ASEAN Eng",
     },
@@ -66,9 +66,9 @@
     // Formal style edge case
     {
       prefix: "Atty.",
-      firstName: "Isabel",
-      middleName: "Morales",
-      lastName: "Dela Peña",
+      firstname: "Isabel",
+      middlename: "Morales",
+      lastname: "Dela Peña",
       extension: "IV",
       suffix: "PhD",
     },
@@ -76,49 +76,49 @@
     // Complex example with abbreviations
     {
       prefix: "Atty., Dr.",
-      firstName: "Francisco",
-      middleName: "Alvarez",
-      lastName: "Ramos",
+      firstname: "Francisco",
+      middlename: "Alvarez",
+      lastname: "Ramos",
       extension: "Jr",
       suffix: "CPA, LLM",
     },
     // Person with only suffix (no prefix)
     {
-      firstName: "Leonardo",
-      lastName: "Marquez",
+      firstname: "Leonardo",
+      lastname: "Marquez",
       suffix: "PhD",
     },
 
     // Person with only extension but no suffix
     {
-      firstName: "Antonio",
-      middleName: "Santos",
-      lastName: "Torres",
+      firstname: "Antonio",
+      middlename: "Santos",
+      lastname: "Torres",
       extension: "II",
     },
 
     // Person with multiple suffixes and prefix
     {
       prefix: "Dr.",
-      firstName: "Carina",
-      middleName: "Velasco",
-      lastName: "Gomez",
+      firstname: "Carina",
+      middlename: "Velasco",
+      lastname: "Gomez",
       suffix: "MD, FPCP",
     },
 
     // Person with only middle name (abbreviation test)
     {
-      firstName: "Luis",
-      middleName: "Dela",
-      lastName: "Rosa",
+      firstname: "Luis",
+      middlename: "Dela",
+      lastname: "Rosa",
     },
 
     // Complex: with prefix, middle, extension, suffix
     {
       prefix: "Atty., Dr.",
-      firstName: "Fernando",
-      middleName: "Cruz",
-      lastName: "Delos Santos",
+      firstname: "Fernando",
+      middlename: "Cruz",
+      lastname: "Delos Santos",
       extension: "Sr",
       suffix: "CPA, JD",
     },
@@ -126,36 +126,36 @@
     // Edge case: prefix string with extra commas/spaces
     {
       prefix: "  Dr. , Engr.  ",
-      firstName: "Rosario",
-      lastName: "Garcia",
+      firstname: "Rosario",
+      lastname: "Garcia",
       suffix: "PE",
     },
 
     // Minimal edge case: only last name and first name
     {
-      firstName: "Ana",
-      lastName: "Lim",
+      firstname: "Ana",
+      lastname: "Lim",
     },
 
     // Edge case: lowercased extension (testing normalization)
     {
-      firstName: "Marc",
-      lastName: "Reyes",
+      firstname: "Marc",
+      lastname: "Reyes",
       extension: "sr",
     },
 
     // Edge case: database messy input with period in extension
     {
-      firstName: "Paolo",
-      lastName: "Ramos",
+      firstname: "Paolo",
+      lastname: "Ramos",
       extension: "Jr.",
       suffix: "MBA",
     },
 
     // Testing long suffix list
     {
-      firstName: "Veronica",
-      lastName: "Bautista",
+      firstname: "Veronica",
+      lastname: "Bautista",
       suffix: "RN, MAN, PhD, DScN",
     },
   ];

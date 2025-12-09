@@ -17,7 +17,12 @@
 </script>
 
 <Sidebar.Root {collapsible} {...restProps}>
-  <Sidebar.Header></Sidebar.Header>
+  <Sidebar.Header class="pl-1 pt-2.5">
+    <Sidebar.Trigger
+      class="cursor-e-resize text-muted-foreground ml-auto"
+      title="open/close sidebar"
+    />
+  </Sidebar.Header>
   <Sidebar.Content>
     <Sidebar.Group>
       <Sidebar.GroupLabel>Main</Sidebar.GroupLabel>

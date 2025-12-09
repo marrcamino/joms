@@ -8,18 +8,7 @@ import TableActions from "./components/table-actions.svelte";
 export const columns: ColumnDef<Employee, unknown>[] = [
   {
     id: "fullname",
-    accessorFn: (row) =>
-      formatFullName(
-        {
-          lastName: row.lastname,
-          firstName: row.firstname,
-          middleName: row.middlename,
-          extension: row.extension,
-        },
-        {
-          order: "formal",
-        }
-      ),
+    accessorFn: (row) => formatFullName(row),
 
     header: "FULLNAME",
 

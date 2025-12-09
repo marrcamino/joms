@@ -1,8 +1,8 @@
 interface NameParts {
   prefix?: string; // comma-separated, parsed internally
-  firstName: string;
-  middleName?: string | null;
-  lastName: string;
+  firstname: string;
+  middlename?: string | null;
+  lastname: string;
   extension?: string | null; // no period stored
   suffix?: string | null; // comma-separated, parsed internally
 }
@@ -66,14 +66,14 @@ function formatMiddleName(
   return clean;
 }
 
-export function formatFullName(
-  parts: NameParts,
+export function formatFullName<T extends NameParts>(
+  parts: T,
   options: NameFormatOptions = {}
-): string {
-  const { prefix, firstName, middleName, lastName, extension, suffix } = parts;
+) {
+  const { prefix, firstname, middlename, lastname, extension, suffix } = parts;
 
   const {
-    order = "normal",
+    order = "formal",
     abbreviateMiddle = false,
     includePrefix = true,
     includeSuffix = true,
@@ -81,7 +81,7 @@ export function formatFullName(
 
   // Format individual parts
   const prefixText = includePrefix ? formatPrefixes(prefix) : "";
-  const middleText = formatMiddleName(middleName, abbreviateMiddle);
+  const middleText = formatMiddleName(middlename, abbreviateMiddle);
   const extensionText = formatExtension(extension);
   const suffixText = includeSuffix ? formatSuffixes(suffix) : "";
 
@@ -89,14 +89,14 @@ export function formatFullName(
 
   if (order === "formal") {
     // Example: Dela Cruz, Juan R., Jr., CPA
-    fullName = `${lastName}, ${firstName}${middleText ? " " + middleText : ""}${
+    fullName = `${lastname}, ${firstname}${middleText ? " " + middleText : ""}${
       extensionText ? ", " + extensionText : ""
     }${suffixText ? ", " + suffixText : ""}`;
   } else {
     // Example: Atty. Juan R. Dela Cruz, Jr., CPA
-    fullName = `${prefixText ? prefixText + " " : ""}${firstName}${
+    fullName = `${prefixText ? prefixText + " " : ""}${firstname}${
       middleText ? " " + middleText : ""
-    } ${lastName}${extensionText ? ", " + extensionText : ""}${
+    } ${lastname}${extensionText ? ", " + extensionText : ""}${
       suffixText ? ", " + suffixText : ""
     }`;
   }

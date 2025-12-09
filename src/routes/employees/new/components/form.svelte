@@ -30,7 +30,7 @@
 <ContractFormFields
   bind:required={contractIsRequired}
   activeContract
-  width="w-[440px]"
+  width="w-full"
 />
 
 <div class="mt-4 text-right pb-6">

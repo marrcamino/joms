@@ -27,10 +27,12 @@
 <header
   class="sticky top-0 z-[2] flex h-12 shrink-0 items-center border-b bg-background transition-[width,height] ease-linear print:hidden"
 >
-  <SidebarTrigger class="cursor-e-resize ml-2 text-muted-foreground" />
+  <div class="ml-4 hidden max-md:block">
+    <SidebarTrigger />
+  </div>
   {#if header}
     <div
-      class="px-2 flex flex-1 items-center gap-2 print:hidden print:size-0 print:overflow-clip"
+      class="px-2 flex flex-1 ml-2 items-center gap-2 print:hidden print:size-0 print:overflow-clip"
     >
       {@render header()}
     </div>
