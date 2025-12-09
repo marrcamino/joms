@@ -33,6 +33,7 @@
       label?: string | null;
     };
     ariaInvalid?: boolean;
+    ref?: HTMLButtonElement | null;
   }
 
   let {
@@ -50,6 +51,7 @@
     onValueChange,
     disabled,
     ariaInvalid,
+    ref = $bindable(null),
   }: Props = $props();
 
   const df = new DateFormatter("en-US", {
@@ -125,6 +127,7 @@
   onOpenChangeComplete={() => onOpenChangeComplete?.(open)}
 >
   <Popover.Trigger
+    bind:ref
     {disabled}
     class={cn(
       buttonVariants({

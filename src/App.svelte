@@ -10,14 +10,17 @@
   import Router from "svelte-spa-router";
 
   const routes = Object.fromEntries(
-    ROUTES.map((route) => [route.url.slice(1), route.page])
+    ROUTES.map((route) => [
+      route.url !== "*" ? route.url.slice(1) : route.url,
+      route.page,
+    ])
   );
 
   const employeeContext = setEmployeeContext();
   const officeContext = setOfficeContext();
 
   onMount(async () => {
-    await officeContext.initData();
+    await officeContext.loadTableData();
     await employeeContext.initData();
   });
 </script>
@@ -25,7 +28,7 @@
 <Sidebar.Provider>
   <AppSidebar />
   <Sidebar.Inset>
-    <Router {routes} useHash={false} />
+    <Router {routes} />
   </Sidebar.Inset>
 </Sidebar.Provider>
 

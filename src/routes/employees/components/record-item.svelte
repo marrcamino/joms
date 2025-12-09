@@ -6,14 +6,14 @@
   import { getOfficeContext } from "$routes/offices/context.svelte";
   import {
     ArrowRight,
+    Bookmark,
+    Building,
     ChevronDown,
     PhilippinePeso,
     Tag,
-    Building,
-    Bookmark,
   } from "@lucide/svelte";
   import { quadInOut } from "svelte/easing";
-  import { fade, fly, slide } from "svelte/transition";
+  import { fade, slide } from "svelte/transition";
   import ContractCardActions from "./contract-card-actions.svelte";
 
   interface Props {

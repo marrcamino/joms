@@ -19,6 +19,10 @@
      */
     autoTrim?: boolean;
 
+    /**
+     * Whether the textarea should automatically adjust its height based on content.
+     * @defaultValue `false`
+     */
     autoHeight?: boolean;
   } = $props();
 

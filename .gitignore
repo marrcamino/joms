@@ -33,5 +33,5 @@ portable-php/*
 !portable-php/htdocs/**
 
 # And also keep these specific files
-!portable-php/router.php
+!portable-php/index.php
 !portable-php/start-server.bat

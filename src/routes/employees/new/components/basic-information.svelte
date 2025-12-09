@@ -160,7 +160,9 @@
     <div data-content={content} class="pb-2 data-[content]:hidden">
       <div class="text-lg uppercase">Basic Information</div>
       <div class="text-sm text-muted-foreground">
-        All required fields are marked with asterisk
+        All fields marked with asterisk &lpar;<span class="text-destructive"
+          >*</span
+        >&rpar; as required.
       </div>
     </div>
 
@@ -225,7 +227,7 @@
               out:fade={{ duration: 200 }}
               class="items-start"
             >
-              <Alert.Root variant="destructive">
+              <Alert.Root variant="danger">
                 <CircleAlert />
                 <Alert.Title>Duplicate Employee Detected</Alert.Title>
                 <Alert.Description>

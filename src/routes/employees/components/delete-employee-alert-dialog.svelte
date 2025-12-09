@@ -51,7 +51,7 @@
     escapeKeydownBehavior={isDeleting ? "ignore" : "close"}
   >
     <AlertDialog.Header>
-      <AlertDialog.Title>Confirm Deletion</AlertDialog.Title>
+      <AlertDialog.Title>Delete Employee?</AlertDialog.Title>
       <AlertDialog.Description>
         This action is permanent and cannot be undone. Deleting this employee
         will also remove all related records from the database.

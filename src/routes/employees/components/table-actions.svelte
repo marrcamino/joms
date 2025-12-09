@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Button } from "$lib/components/ui/button";
+  import { Button, buttonVariants } from "$lib/components/ui/button";
   import * as ButtonGroup from "$lib/components/ui/button-group/index.js";
   import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
   import { ChevronDown, UserPen } from "@lucide/svelte";
@@ -36,17 +36,11 @@
         >View</Button
       >
       <DropdownMenu.Root>
-        <DropdownMenu.Trigger>
-          {#snippet child({ props })}
-            <Button
-              {...props}
-              variant="outline"
-              aria-label="More Options"
-              class="!px-1.5 h-8"
-            >
-              <ChevronDown />
-            </Button>
-          {/snippet}
+        <DropdownMenu.Trigger
+          aria-label="More Options"
+          class={buttonVariants({ size: "icon-sm", variant: "outline" })}
+        >
+          <ChevronDown />
         </DropdownMenu.Trigger>
         <DropdownMenu.Content align="end" class="w-[150px]">
           <DropdownMenu.Group>
@@ -55,7 +49,7 @@
               onclick={() => openSheetOrDialog("editEmployeeState")}
             >
               <UserPen />
-              Edit
+              <span>Edit</span>
             </DropdownMenu.Item>
             <DropdownMenu.Item
               variant="destructive"
@@ -63,7 +57,7 @@
                 openSheetOrDialog("deleteEmployeeAlertDialogState")}
             >
               <Trash2 />
-              Delete
+              <span>Delete</span>
             </DropdownMenu.Item>
           </DropdownMenu.Group>
         </DropdownMenu.Content>

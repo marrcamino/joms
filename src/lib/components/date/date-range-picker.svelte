@@ -5,15 +5,25 @@
 
   interface Props {
     required?: boolean;
+    allRequired?: boolean;
+    // Values
     startDateValue?: DateValue;
     endDateValue?: DateValue;
-    allRequired?: boolean;
+    // Min Value
     startMaxDate?: DateValue;
-    startMinDate?: DateValue;
     endMaxDate?: DateValue;
+    // Max Value
     endMinDate?: DateValue;
+    startMinDate?: DateValue;
+    // Invalid State
     startDateInvalid?: boolean;
     endDateInvalid?: boolean;
+    // labels
+    startDateLabel?: string;
+    endDateLabel?: string;
+    //Trigger Refferences
+    startDateRef?: HTMLButtonElement | null;
+    endDateRef?: HTMLButtonElement | null;
     onValueChange?: (dates: {
       startDate: DateValue | undefined;
       endDate: DateValue | undefined;
@@ -24,15 +34,24 @@
     required,
     allRequired,
     onValueChange,
+    // Values
     startDateValue = $bindable(),
     endDateValue = $bindable(),
-    // Min and Max values
+    // Min Value
     startMaxDate = $bindable(),
-    startMinDate = $bindable(),
     endMaxDate = $bindable(),
+    // Max Value
+    startMinDate = $bindable(),
     endMinDate = $bindable(),
+    //Invalid State
     startDateInvalid,
     endDateInvalid,
+    // labels
+    startDateLabel = "Start Date",
+    endDateLabel = "End Date",
+    //Trigger Refferences
+    startDateRef = $bindable(null),
+    endDateRef = $bindable(null),
   }: Props = $props();
 
   let endDateOpenState = $state(false);
@@ -60,17 +79,18 @@
 <div class="grid grid-cols-2 gap-2">
   <Label class="flex flex-col gap-1 *:w-full">
     <div>
-      <span>Start Date</span>
+      <span>{startDateLabel}</span>
       {#if allRequired}
         <span class="text-destructive">*</span>
       {/if}
     </div>
     <div>
       <DatePicker
-        bind:value={startDateValue}
-        closeOnDateSelect
         name="startDate"
+        closeOnDateSelect
         required={allRequired}
+        bind:ref={startDateRef}
+        bind:value={startDateValue}
         bind:maxDate={startMaxDate}
         bind:minDate={startMinDate}
         ariaInvalid={startDateInvalid}
@@ -94,7 +114,7 @@
     aria-disabled={startDateValue ? undefined : true}
   >
     <div>
-      <span>End Date</span>
+      <span>{endDateLabel}</span>
       {#if allRequired ? true : !!startDateValue && required}
         <span class="text-destructive">*</span>
       {/if}
@@ -104,6 +124,7 @@
         closeOnDateSelect
         name="endDate"
         required={allRequired ? true : !!startDateValue && required}
+        bind:ref={endDateRef}
         bind:minDate={endMinDate}
         bind:maxDate={endMaxDate}
         bind:value={endDateValue}

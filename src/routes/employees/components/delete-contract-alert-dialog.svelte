@@ -68,7 +68,7 @@
     escapeKeydownBehavior={isDeleting ? "ignore" : "close"}
   >
     <AlertDialog.Header>
-      <AlertDialog.Title>Are you absolutely sure?</AlertDialog.Title>
+      <AlertDialog.Title>Delete Contract?</AlertDialog.Title>
       <AlertDialog.Description>
         This action cannot be undone. This will permanently delete this contract
         from the database

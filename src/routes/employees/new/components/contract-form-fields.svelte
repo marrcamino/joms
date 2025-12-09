@@ -1,5 +1,7 @@
 <script lang="ts">
+  import AnimateContent from "$lib/components/animate-content.svelte";
   import DateRangePicker from "$lib/components/date/date-range-picker.svelte";
+  import DateListDisplay from "$lib/components/display/date-list-display.svelte";
   import OfficeSelector from "$lib/components/office-selector.svelte";
   import PositionCategorySelector from "$lib/components/position-category-selector.svelte";
   import { Checkbox } from "$lib/components/ui/checkbox/index.js";
@@ -14,7 +16,7 @@
   } from "@internationalized/date";
   import { untrack } from "svelte";
   import { fade, slide } from "svelte/transition";
-  import OverlapContracts from "./overlap-contracts.svelte";
+  import TextareaRemarks from "./textarea-remarks.svelte";
 
   interface Props {
     required: boolean;
@@ -96,7 +98,7 @@
       if (!employeeId || !endDateValue || !startDateValue) return;
 
       const res = await apiFetch(
-        `/api/employee/contract/check-overlap?employee_id=${employeeId}`,
+        `/api/employee/contract/check-overlap?employee_pk=${employeeId}`,
         {
           method: "POST",
           body: JSON.stringify({
@@ -137,129 +139,128 @@
     required={isItReallyRequired}
     bind:startDateValue
     bind:endDateValue
+    startDateInvalid={!!overlapContracts.length}
+    endDateInvalid={!!overlapContracts.length}
     {allRequired}
   />
-  <div style="min-height: 410.13px; min-width: 410px;">
+
+  <div style="min-width: 410px;">
     {#if overlapContracts.length}
-      <div transition:slide={{ axis: "y", delay: 300 }}>
-        <div in:fade={{ delay: 400 }} out:fade>
-          <OverlapContracts
-            contracts={overlapContracts}
-            {startDateValue}
-            {endDateValue}
-          />
-        </div>
-      </div>
+      <AnimateContent>
+        <DateListDisplay
+          contracts={overlapContracts}
+          {startDateValue}
+          {endDateValue}
+        />
+      </AnimateContent>
     {:else}
-      <div transition:slide={{ axis: "y", delay: 300 }}>
-        <div in:fade={{ delay: 400 }} out:fade>
-          <div class="flex flex-col gap-4">
-            <div>
-              <Label class="flex flex-col gap-1 items-start">
-                <div>
-                  <span>Select Office</span>
-                  {@render requiredAsterisk()}
-                </div>
-                <OfficeSelector
-                  required={isItReallyRequired}
-                  name="officePk"
-                  {width}
-                />
-              </Label>
-            </div>
-
-            <div>
-              <Label class="flex flex-col gap-1 items-start">
-                <div>
-                  <span>Select Position Category</span>
-                  {@render requiredAsterisk()}
-                </div>
-                <PositionCategorySelector name="positionCategoryFk" {width} />
-              </Label>
-            </div>
-
-            <div>
-              <Label for="designation" class="leading-6">
-                <div>
-                  <span>Position</span>
-                  {@render requiredAsterisk()}
-                </div>
-              </Label>
-              <Textarea
-                id="designation"
-                name="designation"
+      <AnimateContent>
+        <div class="flex flex-col gap-4">
+          <div>
+            <Label class="flex flex-col gap-1 items-start">
+              <div>
+                <span>Select Office</span>
+                {@render requiredAsterisk()}
+              </div>
+              <OfficeSelector
                 required={isItReallyRequired}
-                autoHeight
-                autoTrim
+                name="officePk"
+                {width}
               />
-            </div>
+            </Label>
+          </div>
 
-            <div>
-              <Label for="rate" class="leading-6">
-                <div>
-                  <span>Rate</span>
-                  {@render requiredAsterisk()}
-                </div>
-              </Label>
-              <Input
-                id="rate"
-                name="rate"
-                type="number"
-                min="100"
-                required={isItReallyRequired}
+          <div>
+            <Label class="flex flex-col gap-1 items-start">
+              <div>
+                <span>Select Position Category</span>
+                {@render requiredAsterisk()}
+              </div>
+              <PositionCategorySelector name="positionCategoryFk" {width} />
+            </Label>
+          </div>
+
+          <div>
+            <Label for="designation" class="leading-6">
+              <div>
+                <span>Position</span>
+                {@render requiredAsterisk()}
+              </div>
+            </Label>
+            <Textarea
+              id="designation"
+              name="designation"
+              required={isItReallyRequired}
+              autoHeight
+              autoTrim
+            />
+          </div>
+
+          <div>
+            <Label for="rate" class="leading-6">
+              <div>
+                <span>Rate</span>
+                {@render requiredAsterisk()}
+              </div>
+            </Label>
+            <Input
+              id="rate"
+              name="rate"
+              type="number"
+              min="100"
+              required={isItReallyRequired}
+            />
+          </div>
+
+          <div>
+            <Label for="remarks" class="leading-6">
+              <div>Remarks</div>
+            </Label>
+            <TextareaRemarks />
+          </div>
+
+          <div class="pt-2">
+            <div class="flex gap-3">
+              <input
+                type="hidden"
+                name="isActive"
+                value={Number(activeContract).toString()}
               />
-            </div>
-
-            <div>
-              <Label for="remarks" class="leading-6">
-                <div>Remarks</div>
-              </Label>
-              <Textarea id="remarks" name="remarks" autoHeight autoTrim />
-            </div>
-
-            <div class="pt-2">
-              <div class="flex gap-3">
-                <input
-                  type="hidden"
-                  name="isActive"
-                  value={Number(activeContract).toString()}
-                />
-                <Checkbox
-                  id="isActive"
-                  disabled={disableCheckbox}
-                  bind:checked={activeContract}
+              <Checkbox
+                id="isActive"
+                disabled={disableCheckbox}
+                bind:checked={activeContract}
+                title={disableCheckbox ? "checkbox is disabled" : null}
+              />
+              <div>
+                <Label
+                  for="isActive"
+                  aria-disabled={disableCheckbox}
                   title={disableCheckbox ? "checkbox is disabled" : null}
-                />
-                <div>
-                  <Label
-                    for="isActive"
-                    aria-disabled={disableCheckbox}
-                    title={disableCheckbox ? "checkbox is disabled" : null}
-                    class="aria-disabled:text-muted-foreground aria-disabled:cursor-not-allowed w-max"
-                    >Set this contract as active</Label
-                  >
-                  <div
-                    aria-invalid={disableCheckbox ? "true" : undefined}
-                    class="transition-colors aria-[invalid]:text-yellow-600 text-muted-foreground leading-5 mt-1"
-                    style="max-height: 42.5px; overflow: hidden;"
-                  >
-                    {#key errorMessage}
-                      <div
-                        in:slide={{ axis: "y" }}
-                        out:slide={{ axis: "y", delay: 400 }}
-                      >
-                        <div in:fade={{ delay: 500 }} out:fade>
-                          {errorMessage}
-                        </div>
+                  class="aria-disabled:text-muted-foreground aria-disabled:cursor-not-allowed w-max"
+                  >Set this contract as active</Label
+                >
+                <div
+                  aria-invalid={disableCheckbox ? "true" : undefined}
+                  class="transition-colors aria-[invalid]:text-yellow-600 text-muted-foreground leading-5 mt-1"
+                  style="max-height: 42.5px; overflow: hidden;"
+                >
+                  {#key errorMessage}
+                    <div
+                      in:slide={{ axis: "y" }}
+                      out:slide={{ axis: "y", delay: 400 }}
+                    >
+                      <div in:fade={{ delay: 500 }} out:fade>
+                        {errorMessage}
                       </div>
-                    {/key}
-                  </div>
+                    </div>
+                  {/key}
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      </AnimateContent>
     {/if}
   </div>
 </div>

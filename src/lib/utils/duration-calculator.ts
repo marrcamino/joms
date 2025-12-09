@@ -7,6 +7,7 @@ interface DateRangeBase {
 
 export interface ContractBase extends DateRangeBase {
   is_active: 0 | 1;
+  source_type: ContractSourceType;
   [key: string]: any;
 }
 
@@ -89,6 +90,14 @@ function setEffectiveCutoffDate(contracts: ContractBase[]) {
   };
 }
 
+function filterSourceType(
+  contracts: ContractBase[],
+  sourceType: ContractSourceType | null = "contract"
+) {
+  if (!sourceType) return contracts;
+  return contracts.filter((c) => c.source_type === sourceType);
+}
+
 /** Create `Length of Service` Calculator */
 export function createLOSCalculator() {
   let counts = { years: 0, months: 0, days: 0 };
@@ -105,6 +114,18 @@ export function createLOSCalculator() {
 
     contracts = sortContractsByStartDate(contracts);
     contracts = getStableRange(contracts);
+    contracts = filterSourceType(contracts);
+
+    // After sorting, selecting a stable range, and filtering by source type,
+    // the contracts array may end up empty. The check below handles that case
+    // by resetting counts to zero and returning immediately.
+
+    // MO TRIGGER NANI KAY TUNGOD SA CONTRACT SOURCE
+    // FIX THIS SOON
+    if (!contracts.length) {
+      counts = { years: 0, months: 0, days: 0 };
+      return counts;
+    }
 
     const effectiveDates = setEffectiveCutoffDate(contracts);
     contracts = effectiveDates.contracts;

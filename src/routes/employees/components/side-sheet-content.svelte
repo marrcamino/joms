@@ -109,15 +109,7 @@
   {/await}
 
   <div class="text-lg max-[930px]:pt-4">
-    {formatFullName(
-      {
-        lastName: emp.lastname,
-        firstName: emp.firstname,
-        middleName: emp.middlename,
-        extension: emp.extension,
-      },
-      { order: "formal" }
-    )}
+    {formatFullName(emp)}
   </div>
 
   <div style="min-height: 25.5px;">
@@ -165,7 +157,11 @@
               can add one below
             </Empty.Description>
             <Empty.Content>
-              <Button size="sm">Add Contract</Button>
+              <Button
+                size="sm"
+                onclick={() => (sheetContext.addDialogState = true)}
+                >Add Contract</Button
+              >
             </Empty.Content>
           </Empty.Header>
         </Empty.Root>

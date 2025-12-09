@@ -76,6 +76,11 @@ export const nDate = {
     return new Date().toISOString().split("T")[0];
   },
 
+  /** Returns date like `YYYY-MM-DD HH:MM:SS` */
+  get getCurrentTimestamp() {
+    return new Date().toISOString().replace("T", " ").split(".")[0];
+  },
+
   /** Parses a date string and returns `[year, month, day]` based on the `Asia/Manila` timezone. */
   parseDateParts(date: string): [number, number, number] {
     const d = new Date(date);
