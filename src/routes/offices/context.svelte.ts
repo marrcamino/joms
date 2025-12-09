@@ -5,8 +5,13 @@ const OFFICE_CONTEXT_KEY = Symbol("OfficeContextKey");
 
 function createOfficeContext() {
   let offices: Office[] = $state([]);
+  let officeDialogState = $state(false);
+  let deleteDialogState = $state(false);
+  let transmittalDialogState = $state(false);
 
-  async function initData() {
+  let openOffice: null | Office = $state(null);
+
+  async function loadTableData() {
     const res = await apiFetch("/api/office");
     if (!res.ok) return;
     const data = (await res.json()) as Office[];
@@ -17,15 +22,74 @@ function createOfficeContext() {
     return offices.find((office) => office.office_pk === office_pk);
   }
 
+  function add(office: Office) {
+    offices = [...offices, office];
+  }
+
+  function remove(id: number) {
+    offices = offices.filter((o) => o.office_pk !== id);
+  }
+
+  function update(office: Office) {
+    offices = offices.map((o) => {
+      if (o.office_pk === office.office_pk) return office;
+      return o;
+    });
+  }
+
+  /** This will set the openOffice and opens the delete dialog  */
+  function openDeleteDialog(office: Office) {
+    openOffice = office;
+    deleteDialogState = true;
+  }
+
+  /** This currently use for updating office informations */
+  function openOfficeDialog(office: Office) {
+    openOffice = office;
+    officeDialogState = true;
+  }
+
   return {
     get offices() {
       return offices;
     },
-    set offices(ofcs: Office[]) {
-      offices = ofcs;
+    /** Use for deleting and updating office */
+    get openOffice() {
+      return openOffice;
     },
-    initData,
+    get officeDialogState() {
+      return officeDialogState;
+    },
+    get deleteDialogState() {
+      return deleteDialogState;
+    },
+    get transmittalDialogState() {
+      return transmittalDialogState;
+    },
+    set officeDialogState(value: boolean) {
+      officeDialogState = value;
+    },
+    set deleteDialogState(value: boolean) {
+      deleteDialogState = value;
+    },
+    set transmittalDialogState(value: boolean) {
+      transmittalDialogState = value;
+    },
+    set offices(offcs: Office[]) {
+      offices = offcs;
+    },
+    /** Use for deleting and updating office */
+    set openOffice(offcs: Office | null) {
+      openOffice = offcs;
+    },
+
+    loadTableData,
     getOffice,
+    openDeleteDialog,
+    openOfficeDialog,
+    add,
+    remove,
+    update,
   };
 }
 

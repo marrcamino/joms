@@ -6,8 +6,8 @@ declare global {
 
   interface Office {
     office_pk: number;
-    office_title: string;
     office_abbr: string;
+    office_title: string;
   }
 
   interface Employee {

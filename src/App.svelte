@@ -17,7 +17,7 @@
   const officeContext = setOfficeContext();
 
   onMount(async () => {
-    await officeContext.initData();
+    await officeContext.loadTableData();
     await employeeContext.initData();
   });
 </script>

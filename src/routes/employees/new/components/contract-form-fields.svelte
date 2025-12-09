@@ -15,6 +15,7 @@
   import { untrack } from "svelte";
   import { fade, slide } from "svelte/transition";
   import OverlapContracts from "./overlap-contracts.svelte";
+  import TextareaRemarks from "./textarea-remarks.svelte";
 
   interface Props {
     required: boolean;
@@ -214,7 +215,7 @@
               <Label for="remarks" class="leading-6">
                 <div>Remarks</div>
               </Label>
-              <Textarea id="remarks" name="remarks" autoHeight autoTrim />
+              <TextareaRemarks />
             </div>
 
             <div class="pt-2">

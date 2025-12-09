@@ -1,6 +1,7 @@
 import Home from "$routes/home.svelte";
+import OfficeRoute from "$routes/offices/index.svelte";
 import NewEmployee from "$routes/employees/new/index.svelte";
-import { House, Users, type IconProps } from "@lucide/svelte/icons";
+import { House, Users, Building, type IconProps } from "@lucide/svelte/icons";
 import { type Component } from "svelte";
 import {
   wrap as oldWrap,
@@ -50,6 +51,7 @@ export const ROUTES: ROUTES_MAP[] = [
     icon: House,
     page: Home,
   },
+
   {
     title: "Employees",
     url: "#/employees",
@@ -57,6 +59,13 @@ export const ROUTES: ROUTES_MAP[] = [
     page: wrap({
       asyncComponent: () => import("$routes/employees/index.svelte"),
     }),
+  },
+
+  {
+    title: "Offices",
+    url: "#/offices",
+    icon: Building,
+    page: OfficeRoute,
   },
 
   {

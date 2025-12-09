@@ -16,10 +16,13 @@ $routes = [
     '/api/employee/contract' => 'htdocs/api/employee/contract/get.php',
     '/api/office' => 'htdocs/api/office/get.php',
     '/api/position-category' => 'htdocs/api/position-category/get.php',
+    '/api/get-emp-counts' => 'htdocs/api/office/get-emp-counts.php',
   ],
   'POST' => [
     '/api/employee' => 'htdocs/api/employee/create.php',
+    '/api/office' => 'htdocs/api/office/create.php',
     '/api/employee/check-duplicate' => 'htdocs/api/employee/check-duplicate.php',
+    '/api/office/check-duplicate' => 'htdocs/api/office/check-duplicate.php',
     '/api/employee/contract' => 'htdocs/api/employee/contract/create.php',
     '/api/employee/contract/check-overlap' => 'htdocs/api/employee/contract/check-overlap.php',
   ],
@@ -29,10 +32,12 @@ $routes = [
   'PATCH' => [
     '/api/contract/set-active' => 'htdocs/api/contract/set-active.php',
     '/api/employee/update' => 'htdocs/api/employee/update.php',
+    '/api/office/update' => 'htdocs/api/office/update.php',
   ],
   'DELETE' => [
     '/api/employee/contract' => 'htdocs/api/employee/contract/delete.php',
     '/api/employee' => 'htdocs/api/employee/delete.php',
+    '/api/office' => 'htdocs/api/office/delete.php',
   ],
 ];
 

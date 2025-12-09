@@ -55,7 +55,7 @@
               onclick={() => openSheetOrDialog("editEmployeeState")}
             >
               <UserPen />
-              Edit
+              <span>Edit</span>
             </DropdownMenu.Item>
             <DropdownMenu.Item
               variant="destructive"
@@ -63,7 +63,7 @@
                 openSheetOrDialog("deleteEmployeeAlertDialogState")}
             >
               <Trash2 />
-              Delete
+              <span>Delete</span>
             </DropdownMenu.Item>
           </DropdownMenu.Group>
         </DropdownMenu.Content>
