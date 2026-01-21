@@ -44,7 +44,7 @@
   import {
     getEmployeeContext,
     getSideSheetContentContext,
-  } from "../context.svelte";
+  } from "../../context.svelte";
   interface Props {
     open?: boolean;
   }

@@ -1,9 +1,9 @@
 import type { ColumnDef } from "@tanstack/table-core";
 import { formatFullName } from "$lib/utils";
 import { renderComponent } from "$lib/components/ui/data-table/index.js";
-import TblCellPosition from "./components/tbl-cell-position.svelte";
-import TblCellName from "./components/tbl-cell-name.svelte";
-import TableActions from "./components/table-actions.svelte";
+import TblCellPosition from "./components/table/tbl-cell-position.svelte";
+import TblCellName from "./components/table/tbl-cell-name.svelte";
+import TableActions from "./components/table/table-actions.svelte";
 
 export const columns: ColumnDef<Employee, unknown>[] = [
   {

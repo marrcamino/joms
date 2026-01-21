@@ -6,13 +6,47 @@ try {
   $db->beginTransaction();
 
   // Validate employee_id
-  if (!isset($_GET['employee_id']) || empty($_GET['employee_id'])) {
+  if (is_missing($_GET, 'employee_id')) {
     http_response_code(400);
     echo json_encode(['status' => 'error', 'message' => 'Missing employee_id']);
     exit;
+  };
+  $employeeId = $_GET['employee_id'];
+  $input = json_decode(file_get_contents('php://input'), true);
+
+  // SAVING CONTRACT WHERE SOURCE TYPE IS = PDS
+  if (!is_missing($input['source_type']) && $input['source_type'] === 'pds') {
+    $stmt = $db->prepare("
+      INSERT INTO contract (
+        employee_fk, start_date, end_date, designation, rate, office_fk, position_category_fk, source_type, remarks
+      ) VALUES (
+        :employee_fk, :start_date, :end_date, :designation, :rate, :office_fk, :position_category_fk, :source_type, :remarks
+      )
+  ");
+
+    $stmt->bindValue(':employee_fk', $employeeId);
+    $stmt->bindValue(':start_date', $input['startDate']);
+    $stmt->bindValue(':end_date', $input['endDate']);
+    $stmt->bindValue(':designation', $input['designation']);
+    $stmt->bindValue(':rate', $input['rate']);
+    $stmt->bindValue(':office_fk', $input['officePk']);
+    $stmt->bindValue(':position_category_fk', $input['positionCategoryFk']);
+    $stmt->bindValue(':source_type', 'pds');
+    $stmt->bindValue(':remarks', $input['remarks']);
+
+    $stmt->execute();
+
+    $contractPk = (int)$db->lastInsertId();
+
+    $db->commit();
+    echo json_encode([
+      'success' => true,
+      'contract_pk' => $contractPk,
+    ]);
+
+    exit;
   }
 
-  $employeeId = $_GET['employee_id'];
 
   $stmt = $db->prepare("
       INSERT INTO contract (
@@ -21,8 +55,6 @@ try {
         :employee_fk, :start_date, :end_date, :designation, :rate, :office_fk, :position_category_fk, :remarks, :is_active
       )
   ");
-
-  $input = json_decode(file_get_contents('php://input'), true);
 
   $stmt->bindValue(':employee_fk', $employeeId);
   $stmt->bindValue(':start_date', $input['startDate']);

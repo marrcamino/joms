@@ -15,6 +15,7 @@
   import { quadInOut } from "svelte/easing";
   import { fade, slide } from "svelte/transition";
   import ContractCardActions from "./contract-card-actions.svelte";
+  import DateDisplay from "$lib/components/display/date-display.svelte";
 
   interface Props {
     contract: Contract;
@@ -34,7 +35,9 @@
   let collapse = $state(false);
   let isCollapse = $derived(collapse ? "" : null);
   let office = $derived(
-    officeContext.getOffice(contract.office_fk) ?? undefined
+    contract.office_fk
+      ? (officeContext.getOffice(contract.office_fk) ?? undefined)
+      : undefined
   );
 
   let divHeight = $state(0);
@@ -44,17 +47,15 @@
 <Item.Root variant="muted">
   <Item.Content class="gap-0">
     <Item.Title class="w-full">
-      <p class="flex items-center gap-1">
-        <span>{formatDate(contract.start_date)}</span>
-        <ArrowRight class="size-4 text-muted-foreground" />
-        <span>{formatDate(contract.end_date)}</span>
-      </p>
+      <DateDisplay date={contract} />
 
       {#if contract.is_active}
         <Badge variant="outline-constructive">Active</Badge>
       {/if}
 
-      <ContractCardActions {contract} />
+      {#if contract.source_type !== "transmittal"}
+        <ContractCardActions {contract} />
+      {/if}
     </Item.Title>
     <Item.Description
       data-collapse={isCollapse}
@@ -99,6 +100,13 @@
           class="transform-gpu transition-transform duration-300 group-data-[collapse]:rotate-x-180"
         />
       </Button>
+
+      <Badge
+        data-type={contract.source_type}
+        variant="secondary"
+        class="capitalize absolute data-[type='pds']:uppercase -bottom-2.5 -right-2 px-1.5 rounded-sm text-muted-foreground"
+        >{contract.source_type}</Badge
+      >
     </Item.Description>
   </Item.Content>
 </Item.Root>

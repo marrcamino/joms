@@ -52,18 +52,23 @@ get along, so we shut typescript up by casting `value` to `never`.
   {disableDaysOutsideMonth}
   class={cn(
     "bg-background group/calendar p-3 [--cell-size:--spacing(8)] [[data-slot=card-content]_&]:bg-transparent [[data-slot=popover-content]_&]:bg-transparent",
-    className
+    className,
   )}
   {locale}
   {monthFormat}
   {yearFormat}
+  
   {...restProps}
 >
   {#snippet children({ months, weekdays })}
     <Calendar.Months>
       <Calendar.Nav>
-        <Calendar.PrevButton variant={buttonVariant} />
-        <Calendar.NextButton variant={buttonVariant} />
+        <Calendar.PrevButton
+          variant={buttonVariant}
+        />
+        <Calendar.NextButton
+          variant={buttonVariant}
+        />
       </Calendar.Nav>
       {#each months as month, monthIndex (month)}
         <Calendar.Month>

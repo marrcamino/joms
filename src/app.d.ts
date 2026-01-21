@@ -75,15 +75,12 @@ declare global {
 
   type ContractSourceType = "contract" | "pds" | "transmittal";
 
-  // Contract
+  // CONTRACT
   interface BaseContract {
     contract_pk: number;
     employee_fk: Employee["employee_pk"];
     start_date: string; // ISO date  (e.g. "1990-05-20")
-    end_date: string; // ISO date  (e.g. "1990-05-20")
     designation: string;
-    rate: number;
-    office_fk: Office["office_pk"];
     position_category_fk: PositionCategory["position_categ_pk"] | null;
     remarks: string | null;
     /** YYYY-MM-DD HH:mm:ss */
@@ -91,17 +88,33 @@ declare global {
     is_active: 0 | 1;
   }
 
-  interface ContractFromContractOrPDS extends BaseContract {
-    source_type: Exclude<ContractSourceType, "transmittal">;
+  interface ContractDirect extends BaseContract {
+    end_date: string; // ISO date  (e.g. "1990-05-20")
+    office_fk: Office["office_pk"];
+    source_type: Extract<ContractSourceType, "contract">;
     transmittal_item_fk: null;
+    rate: number;
+  }
+
+  interface ContractFromPDS extends BaseContract {
+    /** `null` means `Present` */
+    end_date: string | null; // ISO date  (e.g. "1990-05-20")
+    source_type: Extract<ContractSourceType, "pds">;
+    /** `null`  means office not agency*/
+    office_fk: Office["office_pk"] | null;
+    transmittal_item_fk: null;
+    rate: null | number;
   }
 
   interface ContractFromTransmittal extends BaseContract {
+    end_date: string; // ISO date  (e.g. "1990-05-20")
+    office_fk: Office["office_pk"];
     source_type: Extract<ContractSourceType, "transmittal">;
     transmittal_item_fk: TransmittalItem["transmittal_item_pk"];
+    rate: number;
   }
 
-  type Contract = ContractFromContractOrPDS | ContractFromTransmittal;
+  type Contract = ContractDirect | ContractFromPDS | ContractFromTransmittal;
 }
 
 export {};

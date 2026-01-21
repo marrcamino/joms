@@ -18,7 +18,7 @@
   import {
     getEmployeeContext,
     getSideSheetContentContext,
-  } from "../context.svelte";
+  } from "../../context.svelte";
 
   interface Props {
     open?: boolean;
@@ -155,16 +155,17 @@
 
       startDateValue = new CalendarDate(startyear, startmonth, startday);
       endDateValue = new CalendarDate(endyear, endmonth, endday);
-      officePk = selectedContract.office_fk.toString();
+      officePk = selectedContract.office_fk?.toString() ?? "";
       positionCategPk = (
         selectedContract.position_category_fk ?? "null"
       )?.toString();
       positionTitle = selectedContract.designation;
       remarks = selectedContract.remarks || "";
-      rate = selectedContract.rate.toString();
+      rate = (selectedContract.rate ?? "").toString();
     });
   });
 
+  // CHECK OVERLAP
   $effect(() => {
     startDateValue;
     endDateValue;
@@ -184,7 +185,7 @@
       if (!employeeId || !endDateValue || !startDateValue) return;
 
       const res = await apiFetch(
-        `/api/employee/contract/check-overlap?employee_id=${employeeId}`,
+        `/api/employee/contract/check-overlap?employee_pk=${employeeId}`,
         {
           method: "POST",
           body: JSON.stringify({
@@ -231,7 +232,6 @@
       <div class="space-y-4 relative mt-2">
         <DateRangePicker
           allRequired
-          required
           bind:startDateValue
           bind:endDateValue
           bind:endMinDate
@@ -270,7 +270,6 @@
                     <Label class="flex flex-col gap-1 items-start">
                       <div>
                         <span>Select Position Category</span>
-                        {@render requiredAsterisk()}
                       </div>
                       <PositionCategorySelector
                         name="positionCategoryFk"

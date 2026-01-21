@@ -1,20 +1,22 @@
 <script lang="ts">
   import { Badge } from "$lib/components/ui/badge/index.js";
-  import { Button } from "$lib/components/ui/button";
+  import { Button, buttonVariants } from "$lib/components/ui/button";
+  import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
   import * as Empty from "$lib/components/ui/empty/index.js";
   import { ScrollArea } from "$lib/components/ui/scroll-area/index.js";
   import * as Sheet from "$lib/components/ui/sheet/index.js";
   import { Skeleton } from "$lib/components/ui/skeleton/index.js";
   import { formatFullName } from "$lib/utils";
-  import { FileX2Icon } from "@lucide/svelte";
+  import { ChevronDown, FileX2Icon } from "@lucide/svelte";
   import { onMount, untrack } from "svelte";
   import {
     getEmployeeContext,
     getSideSheetContentContext,
     sheetIsVisible,
   } from "../context.svelte";
-  import type AddContractDialogType from "./add-contract-dialog.svelte";
+  import type AddContractDialogType from "./dialogs/add-contract-dialog.svelte";
   import DurationPreview from "./duration-preview.svelte";
+  import EmplymntPeriodPds from "./dialogs/emplymnt-period-pds/emplymnt-period-pds.svelte";
   import RecordItem from "./record-item.svelte";
 
   const context = getEmployeeContext();
@@ -22,6 +24,7 @@
   const sheetContext = getSideSheetContentContext();
 
   let refetching = $state(false);
+  let open: boolean = $state(false);
 
   let AddContractDialog: typeof AddContractDialogType | undefined =
     $state(undefined);
@@ -35,7 +38,8 @@
   });
 
   onMount(async () => {
-    AddContractDialog = (await import("./add-contract-dialog.svelte")).default;
+    AddContractDialog = (await import("./dialogs/add-contract-dialog.svelte"))
+      .default;
   });
 </script>
 
@@ -54,8 +58,12 @@
 {#snippet sheetContent()}
   {#if context.openEmployee}
     {#if sheetIsVisible.current}
-      <Sheet.Content side="right" class="w-[500px]">
-        <ScrollArea class="h-dvh">
+      <Sheet.Content
+        side="right"
+        class="w-[500px]"
+        portalProps={{ to: "main" }}
+      >
+        <ScrollArea viewPortClasses="max-h-dvh">
           <div class="px-4 pb-4">
             {@render actualContent(context.openEmployee)}
           </div>
@@ -73,41 +81,6 @@
 {/snippet}
 
 {#snippet actualContent(emp: Employee)}
-  {#if AddContractDialog}
-    <AddContractDialog
-      bind:open={sheetContext.addDialogState}
-      afterSave={(id) => {
-        sheetContext.add(id);
-        sheetContext.addDialogState = false;
-      }}
-    />
-  {/if}
-
-  {#await import("./edit-contract-dialog.svelte") then { default: EditContractDialog }}
-    <EditContractDialog
-      bind:open={sheetContext.editDialogState}
-      afterUpdate={(c) => sheetContext.update(c)}
-    />
-  {/await}
-
-  {#await import("./delete-contract-alert-dialog.svelte") then { default: DeleteAlertDialog }}
-    <DeleteAlertDialog
-      bind:open={sheetContext.deleteContractAlertDialogState}
-    />
-  {/await}
-
-  {#await import("./activate-contract-alert-dialog.svelte") then { default: ActiveContractAlertDialog }}
-    <ActiveContractAlertDialog
-      bind:open={sheetContext.activeContractAlertDialogState}
-    />
-  {/await}
-
-  {#await import("./deactivate-contract-alert-dialog.svelte") then { default: DeactiveContractAlertDialog }}
-    <DeactiveContractAlertDialog
-      bind:open={sheetContext.deactiveContractAlertDialogState}
-    />
-  {/await}
-
   <div class="text-lg max-[930px]:pt-4">
     {formatFullName(emp)}
   </div>
@@ -129,13 +102,36 @@
   <div class="pb-2 pt-4 flex items-center">
     <DurationPreview />
 
-    <Button
-      size="sm"
-      class="ml-auto"
-      disabled={!AddContractDialog}
-      variant="secondary"
-      onclick={() => (sheetContext.addDialogState = true)}>Add Contract</Button
-    >
+    <DropdownMenu.Root>
+      <DropdownMenu.Trigger
+        disabled={!AddContractDialog}
+        class={buttonVariants({
+          variant: "secondary",
+          size: "sm",
+          class: "ml-auto",
+        })}
+      >
+        Add Employment
+        <ChevronDown />
+      </DropdownMenu.Trigger>
+      <DropdownMenu.Content>
+        <DropdownMenu.Group>
+          <DropdownMenu.Item
+            onclick={() => (sheetContext.addDialogState = true)}
+            >Contract</DropdownMenu.Item
+          >
+          <DropdownMenu.Item
+            class="gap-1"
+            onclick={() => {
+              open = true;
+            }}
+          >
+            Employment Period
+            <span class="text-muted-foreground">&lpar;PDS&rpar;</span>
+          </DropdownMenu.Item>
+        </DropdownMenu.Group>
+      </DropdownMenu.Content>
+    </DropdownMenu.Root>
   </div>
 
   <div
@@ -173,3 +169,44 @@
     {/if}
   </div>
 {/snippet}
+
+{#if AddContractDialog}
+  <AddContractDialog
+    bind:open={sheetContext.addDialogState}
+    afterSave={(contract) => {
+      sheetContext.add(contract);
+      sheetContext.addDialogState = false;
+    }}
+  />
+{/if}
+
+{#await import("./dialogs/edit-contract-dialog.svelte") then { default: EditContractDialog }}
+  <EditContractDialog
+    bind:open={sheetContext.editDialogState}
+    afterUpdate={(c) => sheetContext.update(c)}
+  />
+{/await}
+
+{#await import("./dialogs/delete-contract-alert-dialog.svelte") then { default: DeleteAlertDialog }}
+  <DeleteAlertDialog bind:open={sheetContext.deleteContractAlertDialogState} />
+{/await}
+
+{#await import("./dialogs/activate-contract-alert-dialog.svelte") then { default: ActiveContractAlertDialog }}
+  <ActiveContractAlertDialog
+    bind:open={sheetContext.activeContractAlertDialogState}
+  />
+{/await}
+
+{#await import("./dialogs/deactivate-contract-alert-dialog.svelte") then { default: DeactiveContractAlertDialog }}
+  <DeactiveContractAlertDialog
+    bind:open={sheetContext.deactiveContractAlertDialogState}
+  />
+{/await}
+
+<EmplymntPeriodPds
+  bind:open
+  afterSave={(contract) => {
+    sheetContext.add(contract);
+    open = false;
+  }}
+/>

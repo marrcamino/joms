@@ -7,7 +7,7 @@
   import {
     getEmployeeContext,
     getSideSheetContentContext,
-  } from "../context.svelte";
+  } from "../../context.svelte";
 
   interface Props {
     employee: Employee;
