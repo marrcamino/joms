@@ -4,6 +4,7 @@
   import * as Breadcrumb from "$lib/components/ui/breadcrumb/index.js";
   import { Button, buttonVariants } from "$lib/components/ui/button/index";
   import * as Drawer from "$lib/components/ui/drawer/index.js";
+  import type { APPOINTMENT_STATUS_KEY } from "$lib/constants";
   import { apiFetch } from "$lib/utils";
   import { Plus, Save } from "@lucide/svelte";
   import { onMount, tick } from "svelte";
@@ -12,16 +13,17 @@
   import { setDraftTransmittalContext } from "../components/transmittal-dialog/context.svelte";
   import { getOfficeContext } from "../context.svelte";
   import AddEditTransmittalPage from "./components/add-edit-transmittal-page.svelte";
-  import DeleteDialog from "./components/delete-dialog.svelte";
+  import DeleteDialog from "./components/delete-transmittal-dialog.svelte";
   import Tbl from "./components/open-transmittal/tbl.svelte";
   import { setOfficeAllTransmittalContext } from "./context.svelte";
   import OfficeTransmittalTbl from "./office-transmittal-tbl.svelte";
+  import { getPageParams, replaceUrl } from "./page-fcs";
 
   let pageIsReady = $state(false);
 
   const officeCtx = getOfficeContext();
   /** Office Transmittal Context*/
-  const officeTxCtx = setOfficeAllTransmittalContext();
+  const officeAllTransCtx = setOfficeAllTransmittalContext();
   /** Office Transmittal Draft Context*/
   const txDraftCtx = setDraftTransmittalContext();
   let isSubmitting = $state(false);
@@ -35,6 +37,18 @@
 
   async function save() {
     try {
+      const appointmentStatusInput = document.querySelector<HTMLInputElement>(
+        "input[name=appointmentStatus]",
+      );
+
+      if (!appointmentStatusInput?.value) {
+        appointmentStatusInput?.setCustomValidity(
+          "Please select an appointment status",
+        );
+        appointmentStatusInput?.reportValidity();
+        return;
+      }
+
       if (isSubmitting) return;
       isSubmitting = true;
       const office_pk = txDraftCtx.office?.office_pk;
@@ -63,13 +77,16 @@
         start_date: dateRange.start_date,
         end_date: dateRange.end_date,
         funding_charge: txDraftCtx.getSourceFunds(),
+        appointment_status: Number(
+          appointmentStatusInput.value,
+        ) as APPOINTMENT_STATUS_KEY,
       };
       const res = await apiFetch(
         `/api/office/transmittal?office_pk=${office_pk}`,
         {
           method: "POST",
           body: JSON.stringify(newTransmittal),
-        }
+        },
       );
 
       if (!res.ok) {
@@ -79,7 +96,7 @@
 
       const transmittal_pk = ((await res.json()) as any)
         .transmittal_pk as number;
-      officeTxCtx.addTransmittal({
+      officeAllTransCtx.addTransmittal({
         ...newTransmittal,
         transmittal_pk,
         office_fk: office_pk,
@@ -95,6 +112,28 @@
     }
   }
 
+  function openDrawer() {
+    const { transmittal_pk } = getPageParams();
+
+    if (!transmittal_pk) return;
+
+    const transmittal = officeAllTransCtx.transmittals.find(
+      (t) => t.transmittal_pk === Number(transmittal_pk),
+    );
+
+    if (!transmittal) {
+      toast.error("Transmittal Not Found", {
+        description:
+          "The requested transmittal is either deleted or couldn't be found",
+        duration: 5000,
+      });
+
+      replaceUrl("transmittal");
+      return;
+    }
+    officeAllTransCtx.openDrawer(transmittal);
+  }
+
   onMount(async () => {
     if (officeCtx.addTransmittal) {
       officeCtx.transmittalPageState = true;
@@ -103,7 +142,8 @@
       officeCtx.addTransmittal = false;
     }
 
-    let officeId = $state(window.location.hash.split("/")[2]);
+    let officeId = getPageParams().office_pk;
+
     if (!officeId) {
       pageIsReady = false;
       return;
@@ -124,23 +164,26 @@
     pageIsReady = true;
 
     txDraftCtx.office = theOffice;
-    officeTxCtx.office = theOffice;
+    officeAllTransCtx.office = theOffice;
 
     const res2 = await apiFetch(
-      `/api/office/transmittal?office_fk=${officeTxCtx.office.office_pk}`
+      `/api/office/transmittal?office_fk=${officeAllTransCtx.office.office_pk}`,
     );
 
     if (!res2.ok) return;
 
     const data2 = (await res2.json()) as Transmittal[];
 
-    officeTxCtx.transmittals = data2;
+    officeAllTransCtx.transmittals = data2;
+
+    await tick();
+    openDrawer();
   });
 </script>
 
 <svelte:head>
-  {#if pageIsReady && officeTxCtx.office}
-    <title>Office / {officeTxCtx.office.office_abbr}</title>
+  {#if pageIsReady && officeAllTransCtx.office}
+    <title>Office / {officeAllTransCtx.office.office_abbr}</title>
   {:else}
     <title>Office</title>
   {/if}
@@ -149,7 +192,7 @@
 <RouteContent>
   {#snippet header()}
     <div class="flex w-full items-center">
-      {#if pageIsReady && officeTxCtx.office}
+      {#if pageIsReady && officeAllTransCtx.office}
         <div class="flex-1 truncate md:ml-2">
           <Breadcrumb.Root>
             <Breadcrumb.List>
@@ -164,7 +207,7 @@
                   {#if officeCtx.transmittalPageState}
                     <span>Add Transmittal - </span>
                   {/if}
-                  {officeTxCtx.office.office_abbr}
+                  {officeAllTransCtx.office.office_abbr}
                 </Breadcrumb.Page>
               </Breadcrumb.Item>
             </Breadcrumb.List>
@@ -195,7 +238,7 @@
         onclick={() => (txDraftCtx.addEmpDialogState = true)}
       >
         <Plus />
-        <span>Add Employee</span>
+        <span>Add Entry</span>
       </Button>
       <Button size="sm" class="ml-auto" onclick={save}>
         <Save />
@@ -230,7 +273,7 @@
   {/if}
 </RouteContent>
 
-<DeleteDialog />
+<DeleteDialog bind:open={officeAllTransCtx.deleteDialogState}/>
 
 <AlertDialog.Root bind:open={alterDialogState}>
   <AlertDialog.Content>
@@ -251,12 +294,13 @@
 </AlertDialog.Root>
 
 <Drawer.Root
-  bind:open={officeTxCtx.drawerState}
+  bind:open={officeAllTransCtx.drawerState}
   handleOnly
   onOpenChangeComplete={(open) => {
     if (!open) {
-      officeTxCtx.openTransmittal = null;
+      officeAllTransCtx.openTransmittal = null;
       txDraftCtx.resetData();
+       replaceUrl("transmittal")
     }
   }}
 >

@@ -36,7 +36,7 @@
   const selectedValue = $derived.by(() => {
     if (value === "null") return "Uncategorized";
 
-    return categories.find((f) => String(f.position_categ_pk) === value)
+    return categories.find((f) => String(f.position_category_pk) === value)
       ?.post_categ_name;
   });
 
@@ -76,7 +76,7 @@
         data-has-value={value !== "null" ? "" : null}
       >
         <span class="truncate">
-          {selectedValue || "Select office..."}
+          {selectedValue || "Select category..."}
         </span>
         <ChevronsUpDownIcon class="opacity-50" />
 
@@ -109,8 +109,8 @@
             <span class=" text-muted-foreground">Uncategorized</span>
           </Command.Item>
 
-          {#each categories as category (category.position_categ_pk)}
-            {@const officePk = String(category.position_categ_pk)}
+          {#each categories as category (category.position_category_pk)}
+            {@const officePk = String(category.position_category_pk)}
             <Command.Item
               value={officePk}
               keywords={[category.post_categ_name]}

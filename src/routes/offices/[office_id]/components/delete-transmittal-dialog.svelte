@@ -7,24 +7,31 @@
   import { apiFetch } from "$lib/utils";
   import { toast } from "svelte-sonner";
 
-  const officeTxCtx = getOfficeAllTransmittalContext();
+  interface Props {
+    open: boolean;
+    afterDelete?: (
+      trans: NonNullable<typeof officeAllTransCtx.openTransmittal>,
+    ) => void;
+  }
+  const officeAllTransCtx = getOfficeAllTransmittalContext();
+  let { open = $bindable(false), afterDelete }: Props = $props();
+
   let isDeleting = $state(false);
   let shouldClose: EscapeBehaviorType = $derived(
-    isDeleting ? "ignore" : "close"
+    isDeleting ? "ignore" : "close",
   );
 
   async function deleteTransmittal() {
     try {
-      const transmittalPk = officeTxCtx.openTransmittal?.transmittal_pk;
-
-      if (!transmittalPk) {
-        console.error("No transmittalPk: ", transmittalPk);
+      if (!officeAllTransCtx.openTransmittal) {
+        console.error("No transmittalPk");
         return;
       }
+      const transmittalPk = officeAllTransCtx.openTransmittal.transmittal_pk;
 
       const res = await apiFetch(
         `/api/transmittal?transmittal_pk=${transmittalPk}`,
-        { method: "DELETE" }
+        { method: "DELETE" },
       );
 
       if (!res.ok) {
@@ -45,8 +52,9 @@
       }
 
       toast.success("Deleted Successfully");
-      officeTxCtx.removeTransmittal(transmittalPk);
-      officeTxCtx.deleteDialogState = false;
+      officeAllTransCtx.removeTransmittal(transmittalPk);
+      open = false;
+      afterDelete?.(officeAllTransCtx.openTransmittal);
     } finally {
       isDeleting = false;
     }
@@ -54,9 +62,9 @@
 </script>
 
 <AlertDialog.Root
-  bind:open={officeTxCtx.deleteDialogState}
+  bind:open
   onOpenChangeComplete={(open) => {
-    if (!open) officeTxCtx.openTransmittal = null;
+    if (!open) officeAllTransCtx.openTransmittal = null;
   }}
 >
   <AlertDialog.Content

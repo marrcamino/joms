@@ -28,7 +28,9 @@
 <Sidebar.Provider>
   <AppSidebar />
   <Sidebar.Inset>
+    <!-- <div class="absolute overflow-auto size-full"> -->
     <Router {routes} />
+    <!-- </div> -->
   </Sidebar.Inset>
 </Sidebar.Provider>
 

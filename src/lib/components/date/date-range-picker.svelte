@@ -1,5 +1,6 @@
 <script lang="ts">
   import { CalendarDate, type DateValue } from "@internationalized/date";
+  import Checkbox from "../ui/checkbox/checkbox.svelte";
   import { Label } from "../ui/label";
   import DatePicker from "./date-picker.svelte";
 
@@ -24,6 +25,9 @@
     //Trigger Refferences
     startDateRef?: HTMLButtonElement | null;
     endDateRef?: HTMLButtonElement | null;
+
+    allowPresent?: boolean;
+    isPresent?: boolean;
     onValueChange?: (dates: {
       startDate: DateValue | undefined;
       endDate: DateValue | undefined;
@@ -52,6 +56,9 @@
     //Trigger Refferences
     startDateRef = $bindable(null),
     endDateRef = $bindable(null),
+
+    allowPresent = false,
+    isPresent = $bindable(false),
   }: Props = $props();
 
   let endDateOpenState = $state(false);
@@ -78,7 +85,7 @@
 
 <div class="grid grid-cols-2 gap-2">
   <Label class="flex flex-col gap-1 *:w-full">
-    <div>
+    <div class="flex gap-0.5">
       <span>{startDateLabel}</span>
       {#if allRequired}
         <span class="text-destructive">*</span>
@@ -109,37 +116,66 @@
     </div>
   </Label>
 
-  <Label
-    class="flex flex-col gap-1 w-full *:w-full aria-[disabled]:pointer-events-none aria-[disabled]:cursor-not-allowed"
-    aria-disabled={startDateValue ? undefined : true}
-  >
-    <div>
-      <span>{endDateLabel}</span>
-      {#if allRequired ? true : !!startDateValue && required}
-        <span class="text-destructive">*</span>
-      {/if}
-    </div>
-    <div>
-      <DatePicker
-        closeOnDateSelect
-        name="endDate"
-        required={allRequired ? true : !!startDateValue && required}
-        bind:ref={endDateRef}
-        bind:minDate={endMinDate}
-        bind:maxDate={endMaxDate}
-        bind:value={endDateValue}
-        bind:open={endDateOpenState}
-        bind:placeholder={endDatePlaceholder}
-        ariaInvalid={endDateInvalid}
-        disabled={!startDateValue}
-        triggerOptions={{
-          withIcon: false,
-          label: "Select End Date",
-        }}
-        onValueChange={() => {
-          onValueChange?.({ startDate: startDateValue, endDate: endDateValue });
-        }}
-      />
-    </div>
-  </Label>
+  <div class="relative">
+    {#if allowPresent}
+      <div
+        class="flex items-center gap-1.5 ml-auto text-muted-foreground absolute right-0 -top-0.5"
+      >
+        <Checkbox
+          id="endDateIsPresent"
+          bind:checked={isPresent}
+          disabled={!startDateValue}
+          name="endDateIsPresent"
+          value={isPresent ? "1" : "0"}
+        />
+        <Label for="endDateIsPresent">To Present</Label>
+      </div>
+    {/if}
+
+    <Label
+      class="flex flex-col gap-1  w-full *:w-full aria-[disabled]:pointer-events-none aria-[disabled]:cursor-not-allowed"
+      aria-disabled={startDateValue ? undefined : true}
+    >
+      <div class="flex">
+        <span>{endDateLabel}</span>
+        {#if isPresent ? false : allRequired ? true : !!startDateValue && required}
+          <span class="text-destructive ml-0.5">*</span>
+        {/if}
+      </div>
+      <div data-present={isPresent ? "" : null} class="relative group/date">
+        <div
+          class="pointer-events-none group-data-present/date:opacity-50 transition-opacity opacity-0 px-3.5 rounded-sm z-10 absolute pt-[9px] inset-0.5 font-normal"
+        >
+          Present
+        </div>
+        <DatePicker
+          closeOnDateSelect
+          name="endDate"
+          required={isPresent
+            ? false
+            : allRequired
+              ? true
+              : !!startDateValue && required}
+          bind:ref={endDateRef}
+          bind:minDate={endMinDate}
+          bind:maxDate={endMaxDate}
+          bind:value={endDateValue}
+          bind:open={endDateOpenState}
+          bind:placeholder={endDatePlaceholder}
+          ariaInvalid={endDateInvalid}
+          disabled={!startDateValue || isPresent}
+          triggerOptions={{
+            withIcon: false,
+            label: "Select End Date",
+          }}
+          onValueChange={() => {
+            onValueChange?.({
+              startDate: startDateValue,
+              endDate: endDateValue,
+            });
+          }}
+        />
+      </div>
+    </Label>
+  </div>
 </div>

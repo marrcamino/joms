@@ -19,14 +19,15 @@ try {
 
   // Transmittal Table
   $stmt1 = $db->prepare("
-     INSERT INTO transmittal (office_fk, start_date, end_date, funding_charge, remarks) 
-     VALUES (:office_fk, :start_date, :end_date, :funding_charge, :remarks)
+     INSERT INTO transmittal (office_fk, start_date, end_date, appointment_status, funding_charge, remarks) 
+     VALUES (:office_fk, :start_date, :end_date, :appointment_status, :funding_charge, :remarks)
    ");
 
   $stmt1->execute([
     ":office_fk" =>  $_GET['office_pk'],
     ":start_date" =>  $input['start_date'],
     ":end_date" =>  $input['end_date'],
+    ":appointment_status" =>  $input['appointment_status'],
     ":funding_charge" =>  $input['funding_charge'],
     ":remarks" =>  $input['remarks'] ?? null,
   ]);

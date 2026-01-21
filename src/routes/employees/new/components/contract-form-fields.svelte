@@ -17,6 +17,7 @@
   import { untrack } from "svelte";
   import { fade, slide } from "svelte/transition";
   import TextareaRemarks from "./textarea-remarks.svelte";
+  import StatusOfAppointmentSelector from "$lib/components/status-of-appointment-selector.svelte";
 
   interface Props {
     required: boolean;
@@ -174,7 +175,6 @@
             <Label class="flex flex-col gap-1 items-start">
               <div>
                 <span>Select Position Category</span>
-                {@render requiredAsterisk()}
               </div>
               <PositionCategorySelector name="positionCategoryFk" {width} />
             </Label>
@@ -183,7 +183,7 @@
           <div>
             <Label for="designation" class="leading-6">
               <div>
-                <span>Position</span>
+                <span>Designation</span>
                 {@render requiredAsterisk()}
               </div>
             </Label>
@@ -194,6 +194,15 @@
               autoHeight
               autoTrim
             />
+          </div>
+
+          <div>
+            <Label class="flex-col items-start gap-1">
+              <div>
+                <span>Status of Appointment</span>
+              </div>
+              <StatusOfAppointmentSelector name="appointment_status" />
+            </Label>
           </div>
 
           <div>

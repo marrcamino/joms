@@ -1,4 +1,5 @@
 <script lang="ts">
+  import StatusOfAppointmentSelector from "$lib/components/status-of-appointment-selector.svelte";
   import { Badge } from "$lib/components/ui/badge/index.js";
   import * as ButtonGroup from "$lib/components/ui/button-group/index.js";
   import { buttonVariants } from "$lib/components/ui/button/index.js";
@@ -10,19 +11,20 @@
   import { Pencil, Trash2 } from "@lucide/svelte";
   import { ScrollState } from "runed";
   import { fly } from "svelte/transition";
-  import { getOfficeContext } from "../../context.svelte";
   import { getDraftTransmittalContext } from "../../components/transmittal-dialog/context.svelte";
+  import { getOfficeContext } from "../../context.svelte";
+  import AddEmployeeDialog from "./add-entry-dialog.svelte";
   import EmptyTransmittal from "./empty-transmittal.svelte";
-  import AddEmployeeDialog from "./add-employee-dialog.svelte";
 
   const context = getOfficeContext();
-  const transContext = getDraftTransmittalContext();
+  const txDraftCtx = getDraftTransmittalContext();
 
   let el = $state<HTMLElement>();
   const scroll = new ScrollState({ element: () => el });
-  let remarks = $state("");
 
-  let isEmpty = $derived(transContext.empTrans.length === 0);
+  let remarks = $state("");
+  let status = $state("");
+  let isEmpty = $derived(txDraftCtx.empTrans.length === 0);
 
   let arrivedRight = $derived.by(() => {
     if (Number.isNaN(scroll.progress.x)) return "";
@@ -57,7 +59,7 @@
             </Table.Row>
           </Table.Header>
           <Table.Body>
-            {#each transContext.empTrans as emp, i (emp.uuid)}
+            {#each txDraftCtx.empTrans as emp, i (emp.uuid)}
               {@const office = context.getOffice(Number(emp.office_fk))}
               <tr
                 transition:fly={{ x: -10, duration: 200 }}
@@ -94,8 +96,8 @@
                                 size: "icon-sm",
                               })}
                               onclick={() => {
-                                transContext.empTranToEdit = emp;
-                                transContext.addEmpDialogState = true;
+                                txDraftCtx.empTranToEdit = emp;
+                                txDraftCtx.addEmpDialogState = true;
                               }}
                             >
                               <Pencil class="border-none" />
@@ -114,7 +116,7 @@
                                 size: "icon-sm",
                               })}
                               onclick={() => {
-                                transContext.remove(emp.uuid);
+                                txDraftCtx.remove(emp.uuid);
                               }}
                             >
                               <Trash2 class="border-none" />
@@ -142,6 +144,21 @@
 
       {#if !isEmpty}
         <div class="pt-4">
+          <Label class="flex-col items-start gap-0 w-max">
+            <p class="flex gap-1 pb-1">
+              <span>Appointment Status</span>
+              <span class="text-muted-foreground">
+                &lpar;Applies to all entries&rpar;
+              </span>
+            </p>
+            <StatusOfAppointmentSelector
+              class="w-[288px]"
+              bind:value={status}
+              name="appointmentStatus"
+            />
+          </Label>
+        </div>
+        <div class="pt-3">
           <Label for="remarks" class="leading-6 gap-1">
             Remarks/Note
             <span class="text-muted-foreground">&lpar;Optional&rpar;</span>

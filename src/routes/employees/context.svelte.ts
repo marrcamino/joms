@@ -104,6 +104,7 @@ function createEmployeeContext() {
           office_fk: emp.office_fk,
           designation: emp.designation,
           is_active: 1,
+
         };
         return updatedEmployee;
       }
@@ -154,7 +155,7 @@ function createEmployeeContext() {
 
 function createSideSheetContentContext() {
   let contracts: undefined | Contract[] = $state();
-  /** For `deleting` or `Updating` contract */
+  /** For `deleting` or `Updating` contract/pds record */
   let selectedContract: null | Contract = $state(null);
 
   const los = createLOSCalculator();
@@ -162,6 +163,9 @@ function createSideSheetContentContext() {
   let addDialogState = $state(false);
   let editDialogState = $state(false);
   let editEmployeeState = $state(false);
+  let editPdsDialogState = $state(false);
+  let editTransItemDialogState = $state(false);
+  let deleteTransItemDialogState = $state(false);
   let deleteContractAlertDialogState = $state(false);
   let deleteEmployeeAlertDialogState = $state(false);
   let activeContractAlertDialogState = $state(false);
@@ -258,11 +262,20 @@ function createSideSheetContentContext() {
     get editEmployeeState() {
       return editEmployeeState;
     },
+    get editPdsDialogState() {
+      return editPdsDialogState;
+    },
+    get editTransItemDialogState() {
+      return editTransItemDialogState;
+    },
     get deleteContractAlertDialogState() {
       return deleteContractAlertDialogState;
     },
     get deleteEmployeeAlertDialogState() {
       return deleteEmployeeAlertDialogState;
+    },
+    get deleteTransItemDialogState() {
+      return deleteTransItemDialogState;
     },
     get isFetching() {
       return isFetching;
@@ -299,11 +312,20 @@ function createSideSheetContentContext() {
     set editEmployeeState(v: boolean) {
       editEmployeeState = v;
     },
+    set editPdsDialogState(v: boolean) {
+      editPdsDialogState = v;
+    },
+    set editTransItemDialogState(v: boolean) {
+      editTransItemDialogState = v;
+    },
     set deleteContractAlertDialogState(v: boolean) {
       deleteContractAlertDialogState = v;
     },
     set deleteEmployeeAlertDialogState(v: boolean) {
       deleteEmployeeAlertDialogState = v;
+    },
+    set deleteTransItemDialogState(v: boolean) {
+      deleteTransItemDialogState = v;
     },
     set isFetching(v: boolean) {
       isFetching = v;

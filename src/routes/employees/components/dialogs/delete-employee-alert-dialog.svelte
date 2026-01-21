@@ -4,7 +4,7 @@
   import { Spinner } from "$lib/components/ui/spinner";
   import { apiFetch } from "$lib/utils";
   import { toast } from "svelte-sonner";
-  import { getEmployeeContext } from "../context.svelte";
+  import { getEmployeeContext } from "../../context.svelte";
 
   interface Props {
     open?: boolean;

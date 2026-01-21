@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../helpers.php';
 
 try {
+
   if (is_missing($_GET, 'transmittal_pk')) {
     http_response_code(400);
     echo json_encode([

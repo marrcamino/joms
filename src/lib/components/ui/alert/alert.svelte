@@ -12,7 +12,7 @@
           "dark:text-red-200 text-red-800 dark:border-destructive bg-destructive/20 *:data-[slot=alert-description]:text-red-800 *:data-[slot=alert-description]:dark:text-red-200/80 [&>svg]:text-current border-red-500",
         success:
           "dark:text-green-100 text-green-800 bg-green-400/15 *:data-[slot=alert-description]:text-green-800 *:data-[slot=alert-description]:dark:text-green-100/70 [&>svg]:text-current dark:border-green-100/50 border-green-800",
-        info: "dark:text-blue-100 text-blue-800 bg-blue-400/15 *:data-[slot=alert-description]:text-blue-800 *:data-[slot=alert-description]:dark:text-blue-100/70 [&>svg]:text-current dark:border-blue-100/50 border-blue-800",
+        info: "text-info bg-blue-400/15 *:data-[slot=alert-description]:text-blue-800 *:data-[slot=alert-description]:dark:text-blue-100/70 [&>svg]:text-current dark:border-blue-100/50 border-blue-800",
       },
     },
     defaultVariants: {

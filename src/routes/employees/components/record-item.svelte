@@ -1,41 +1,66 @@
 <script lang="ts">
+  import DateDisplay from "$lib/components/display/date-display.svelte";
   import { Badge } from "$lib/components/ui/badge/index.js";
   import { Button } from "$lib/components/ui/button";
   import * as Item from "$lib/components/ui/item/index.js";
-  import { formatDate } from "$lib/utils";
+  import { Skeleton } from "$lib/components/ui/skeleton/index.js";
+  import { APPOINTMENT_STATUS_MAP } from "$lib/constants";
+  import { getPositionCategoryStoreContext } from "$lib/context/appointment-categ-store.svelte";
   import { getOfficeContext } from "$routes/offices/context.svelte";
   import {
-    ArrowRight,
     Bookmark,
     Building,
     ChevronDown,
     PhilippinePeso,
     Tag,
+    UserCog,
   } from "@lucide/svelte";
+  import { untrack } from "svelte";
   import { quadInOut } from "svelte/easing";
   import { fade, slide } from "svelte/transition";
-  import ContractCardActions from "./contract-card-actions.svelte";
+  import ContractCardActions from "./record-item-actions.svelte";
 
   interface Props {
     contract: Contract;
   }
 
   let { contract }: Props = $props();
+
   const officeContext = getOfficeContext();
+  const categStore = getPositionCategoryStoreContext();
   const icons = {
     peso: PhilippinePeso,
     tag: Tag,
     building: Building,
     bookmark: Bookmark,
+    user: UserCog,
   };
 
   type IconKey = keyof typeof icons;
 
   let collapse = $state(false);
   let isCollapse = $derived(collapse ? "" : null);
-  let office = $derived(
-    officeContext.getOffice(contract.office_fk) ?? undefined
-  );
+  let officeTitle = $derived.by(() => {
+    if (!contract.office_fk) return null;
+    return officeContext.getOffice(contract.office_fk)?.office_title ?? null;
+  });
+
+  let category: undefined | null | string = $state(undefined);
+
+  $effect(() => {
+    contract;
+
+    untrack(async () => {
+      if (!contract.position_category_fk) {
+        category = null;
+        return;
+      }
+      const theCateg = await categStore.getCategory(
+        contract.position_category_fk,
+      );
+      category = theCateg ? theCateg.post_categ_name : null;
+    });
+  });
 
   let divHeight = $state(0);
   let isLong = $derived(divHeight > 25 ? "" : null);
@@ -44,11 +69,7 @@
 <Item.Root variant="muted">
   <Item.Content class="gap-0">
     <Item.Title class="w-full">
-      <p class="flex items-center gap-1">
-        <span>{formatDate(contract.start_date)}</span>
-        <ArrowRight class="size-4 text-muted-foreground" />
-        <span>{formatDate(contract.end_date)}</span>
-      </p>
+      <DateDisplay date={contract} />
 
       {#if contract.is_active}
         <Badge variant="outline-constructive">Active</Badge>
@@ -76,10 +97,15 @@
               </div>
 
               <div class="pt-2">
-                {@render row("Rate", `${contract.rate}/Month`, "peso")}
-                {@render row("Category", "Technical Staff", "tag")}
-                {@render row("Office", office?.office_title, "building")}
-                {@render row("Remarks", contract.remarks || "None", "bookmark")}
+                {@render row(
+                  "Status",
+                  APPOINTMENT_STATUS_MAP[contract.appointment_status],
+                  "user",
+                )}
+                {@render row("Rate", contract.rate, "peso", "/Month")}
+                {@render row("Category", category, "tag")}
+                {@render row("Office", officeTitle, "building")}
+                {@render row("Remarks", contract.remarks, "bookmark")}
               </div>
             </div>
           </div>
@@ -99,17 +125,34 @@
           class="transform-gpu transition-transform duration-300 group-data-[collapse]:rotate-x-180"
         />
       </Button>
+
+      <Badge
+        data-type={contract.source_type}
+        variant="secondary"
+        class="capitalize absolute data-[type='pds']:uppercase -bottom-2.5 -right-2 px-1.5 rounded-sm text-muted-foreground"
+        >{contract.source_type}</Badge
+      >
     </Item.Description>
   </Item.Content>
 </Item.Root>
 
-{#snippet row(title: string, value: undefined | string, iconKey: IconKey)}
+{#snippet row(title: string, value: any, iconKey: IconKey, post?: string)}
   {@const Icon = icons[iconKey]}
   <div class="grid grid-cols-[16px_1fr] gap-2 pt-1">
     <Icon class="size-3.5 translate-y-1" />
-    <span>
+    <p class="flex items-start gap-1">
       <span class="font-semibold text-foreground">{title}:</span>
-      {value}
-    </span>
+
+      {#if typeof value === "undefined"}
+        <Skeleton class="h-4 w-[50px] rounded-sm translate-y-0.5" />
+      {:else}
+        <span
+          data-empty={!value ? "" : null}
+          class="data-empty:text-yellow-600"
+        >
+          {value ? `${value + (post ?? "")}` : "—"}
+        </span>
+      {/if}
+    </p>
   </div>
 {/snippet}

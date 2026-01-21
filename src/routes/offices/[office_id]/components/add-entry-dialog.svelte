@@ -21,6 +21,8 @@
   import Designation from "../../components/transmittal-dialog/designation.svelte";
   import SearchEmployeeCombobox from "../../components/transmittal-dialog/search-employee-combobox.svelte";
   import { getOfficeAllTransmittalContext } from "../context.svelte";
+  import Asterisk from "$lib/components/display/asterisk.svelte";
+  import { replaceUrl } from "../page-fcs";
 
   interface Props {
     /** This will work the `singleSave` props is true*/
@@ -100,7 +102,7 @@
     );
 
     if (!res.ok) {
-      toast.error("Unable to save employee", {
+      toast.error("Unable to save entry", {
         description: "Please try again",
       });
       return;
@@ -108,7 +110,7 @@
 
     const data = (await res.json()) as TransmittalContractItems;
     afterAdd?.(data);
-    toast.success("Employee added", {
+    toast.success("Entry added", {
       description: "Successfully included in this transmittal",
     });
     drfTransCtx.addEmpDialogState = false;
@@ -135,7 +137,7 @@
     );
 
     if (!res.ok) {
-      toast.error("Unable to update employee", {
+      toast.error("Unable to update entry", {
         description: "Please try again",
       });
       return;
@@ -293,6 +295,7 @@
       resetFormValues();
       drfTransCtx.empTranToEdit = null;
       drfTransCtx.noOverlapCheck = false;
+      replaceUrl("item")
     }
   }}
 >
@@ -304,13 +307,11 @@
       <Dialog.Header>
         <Dialog.Title>
           {drfTransCtx.empTranToEdit
-            ? "Update Employee"
-            : "Add Employee"}</Dialog.Title
+            ? "Update Entry"
+            : "Add New Entry"}</Dialog.Title
         >
         <Dialog.Description
-          >All fields marked with asterisk &lpar;<span class="text-destructive"
-            >*</span
-          >&rpar; are required
+          >All fields marked with asterisk <Asterisk withParentheses/> are required
         </Dialog.Description>
       </Dialog.Header>
       <div>
@@ -352,7 +353,7 @@
                   bind:isFocus
                   {employeePk}
                   onClickUse={(contract) => {
-                    rate = contract.rate.toString();
+                    rate = contract.rate?.toString() || '';
                     document.getElementById("rate")?.focus();
                   }}
                 />
@@ -461,7 +462,7 @@
       <Dialog.Footer>
         <Dialog.Close>Cancel</Dialog.Close>
         <Button disabled={sumbitDisable} type="submit">
-          {drfTransCtx.empTranToEdit ? "Update" : "Add Employee"}
+          {drfTransCtx.empTranToEdit ? "Update" : "Add Entry"}
         </Button>
       </Dialog.Footer>
     </form>

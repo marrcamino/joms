@@ -35,6 +35,7 @@ try {
       rate = :rate,
       office_fk = :officePk,
       remarks = :remarks,
+      appointment_status = :appointment_status,
       position_category_fk = :positionCategoryFk
     WHERE contract_pk = :contract_pk
   ");
@@ -46,6 +47,7 @@ try {
   $stmt->bindValue(':officePk', $input['officePk']);
   $stmt->bindValue(':positionCategoryFk', $input['positionCategoryFk']);
   $stmt->bindValue(':remarks', $input['remarks']);
+  $stmt->bindValue(':appointment_status', $input['appointment_status']);
   $stmt->bindValue(':contract_pk', $contractPk, PDO::PARAM_INT);
 
   $stmt->execute();

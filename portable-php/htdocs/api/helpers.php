@@ -85,6 +85,26 @@ function getOverlappingContracts(
     $sourceType = 'contract';
   }
 
+  if ($sourceType === 'pds') {
+    $sql = "
+      SELECT *
+      FROM contract
+      WHERE employee_fk = :emp
+        AND source_type = 'pds'
+        AND end_date IS NULL
+    ";
+
+    $stmt = $db->prepare($sql);
+    $stmt->bindValue(':emp', $employeeId, PDO::PARAM_INT);
+
+    $stmt->execute();
+    $contract =  $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($contract && ($startDate >= $contract['start_date'] || $endDate >= $contract['start_date'])) {
+      return [$contract];
+    }
+  }
+
   $sql = "
     SELECT *
     FROM contract
@@ -137,7 +157,7 @@ function is_missing(mixed $valueOrArray, ?string $key = null): bool
 }
 
 $tables = [
-  "transmittal" =>  ["office_fk", "start_date", 'end_date', 'funding_charge', 'remarks']
+  "transmittal" =>  ["office_fk", "start_date", 'end_date', 'appointment_status', 'funding_charge', 'remarks']
 ];
 
 /**

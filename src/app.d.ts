@@ -1,4 +1,31 @@
-import type { SEX_KEY } from "$lib/constant";
+import type { APPOINTMENT_STATUS_KEY, SEX_KEY } from "$lib/constants";
+
+interface BaseEmployee {
+  employee_pk: number;
+  firstname: string;
+  lastname: string;
+  middlename: string | null;
+  extension: string | null;
+  /** 1 = Male, 2 = Female */
+  sex: SEX_KEY | null;
+  birthday: string | null; // ISO date string
+  address: string | null;
+  email: string | null;
+}
+
+interface BaseContract {
+  contract_pk: number;
+  employee_fk: Employee["employee_pk"];
+  start_date: string; // ISO date  (e.g. "1990-05-20")
+  designation: string;
+  position_category_fk: PositionCategory["position_category_pk"] | null;
+  remarks: string | null;
+  /** 1=JO,2=COS */
+  appointment_status: APPOINTMENT_STATUS_KEY;
+  /** YYYY-MM-DD HH:mm:ss */
+  created_at: string;
+  is_active: 0 | 1;
+}
 
 declare global {
   /** http://localhost:8080/ */
@@ -19,19 +46,6 @@ declare global {
     office_title: string;
   }
 
-  interface BaseEmployee {
-    employee_pk: number;
-    firstname: string;
-    lastname: string;
-    middlename: string | null;
-    extension: string | null;
-    /** 1 = Male, 2 = Female */
-    sex: SEX_KEY | null;
-    birthday: string | null; // ISO date string
-    address: string | null;
-    email: string | null;
-  }
-
   interface ActiveEmployee extends BaseEmployee {
     is_active: 1;
     office_fk: Office["office_pk"];
@@ -47,7 +61,7 @@ declare global {
   type Employee = ActiveEmployee | InactiveEmployee;
 
   interface PositionCategory {
-    position_categ_pk: number;
+    position_category_pk: number;
     post_categ_name: string;
   }
 
@@ -62,6 +76,7 @@ declare global {
     office_fk: number;
     start_date: string;
     end_date: string;
+    appointment_status: APPOINTMENT_STATUS_KEY;
     funding_charge: string;
     remarks: string | null;
   }
@@ -75,33 +90,34 @@ declare global {
 
   type ContractSourceType = "contract" | "pds" | "transmittal";
 
-  // Contract
-  interface BaseContract {
-    contract_pk: number;
-    employee_fk: Employee["employee_pk"];
-    start_date: string; // ISO date  (e.g. "1990-05-20")
+  // CONTRACT
+  interface ContractDirect extends BaseContract {
     end_date: string; // ISO date  (e.g. "1990-05-20")
-    designation: string;
-    rate: number;
     office_fk: Office["office_pk"];
-    position_category_fk: PositionCategory["position_categ_pk"] | null;
-    remarks: string | null;
-    /** YYYY-MM-DD HH:mm:ss */
-    created_at: string;
-    is_active: 0 | 1;
+    source_type: Extract<ContractSourceType, "contract">;
+    transmittal_item_fk: null;
+    rate: number;
   }
 
-  interface ContractFromContractOrPDS extends BaseContract {
-    source_type: Exclude<ContractSourceType, "transmittal">;
+  interface ContractFromPDS extends BaseContract {
+    /** `null` means `Present` */
+    end_date: string | null; // ISO date  (e.g. "1990-05-20")
+    source_type: Extract<ContractSourceType, "pds">;
+    /** `null`  means office not agency*/
+    office_fk: Office["office_pk"] | null;
     transmittal_item_fk: null;
+    rate: null | number;
   }
 
   interface ContractFromTransmittal extends BaseContract {
+    end_date: string; // ISO date  (e.g. "1990-05-20")
+    office_fk: Office["office_pk"];
     source_type: Extract<ContractSourceType, "transmittal">;
     transmittal_item_fk: TransmittalItem["transmittal_item_pk"];
+    rate: number;
   }
 
-  type Contract = ContractFromContractOrPDS | ContractFromTransmittal;
+  type Contract = ContractDirect | ContractFromPDS | ContractFromTransmittal;
 }
 
-export {};
+export { };

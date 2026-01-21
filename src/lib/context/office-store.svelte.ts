@@ -3,11 +3,7 @@ import { getContext, setContext } from "svelte";
 import { SvelteMap } from "svelte/reactivity";
 const CONTEXT_KEY = Symbol("office-store");
 
-type WithOfficePk =
-  | {
-      office_pk: number;
-    }
-  | { office_fk: number };
+type WithOfficePk = { office_pk: number } | { office_fk: number };
 
 function createOfficeStoreContext<T extends WithOfficePk>(array: T[]) {
   let isFetching = $state(false);

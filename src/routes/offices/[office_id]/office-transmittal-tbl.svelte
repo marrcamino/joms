@@ -22,7 +22,7 @@
   const offceAllTransCtx = getOfficeAllTransmittalContext();
   const officeCtx = getOfficeContext();
 
-  let sorting = $state<SortingState>([{ id: "start_date", desc: false }]);
+  let sorting = $state<SortingState>([{ id: "start_date", desc: true }]);
   let columnFilters = $state<ColumnFiltersState>([]);
   let columnVisibility = $state<VisibilityState>({});
 

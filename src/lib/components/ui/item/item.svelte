@@ -7,7 +7,7 @@
       variant: {
         default: "bg-transparent",
         outline: "border-border",
-        muted: "bg-muted/50",
+        muted: "bg-muted dark:bg-muted/50",
       },
       size: {
         default: "gap-4 p-4",

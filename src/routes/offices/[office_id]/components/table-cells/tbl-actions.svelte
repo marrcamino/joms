@@ -12,7 +12,7 @@
 
   let { transmittal }: Props = $props();
 
-  const context = getOfficeAllTransmittalContext();
+  const officeTxCtx = getOfficeAllTransmittalContext();
 </script>
 
 <ButtonGroup.Root class="place-self-center">
@@ -20,7 +20,7 @@
     variant="outline"
     size="sm"
     onclick={() => {
-      context.openDrawer(transmittal);
+      officeTxCtx.openDrawer(transmittal);
     }}>View</Button
   >
 
@@ -33,7 +33,7 @@
           class: "border border-accent",
         })}
         onclick={() => {
-          context.openDeleteDialog(transmittal);
+          officeTxCtx.openDeleteDialog(transmittal);
         }}
       >
         <Trash2 /></Tooltip.Trigger

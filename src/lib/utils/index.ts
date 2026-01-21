@@ -1,6 +1,7 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { v4 as uuidv4 } from "uuid";
+import type { Component } from "svelte";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -40,6 +41,50 @@ export function mapToOptions<T extends string | number>(
 }
 
 /**
+ * Maps a numeric-keyed record into an array of option objects with labels and abbreviations.
+ *
+ * Each entry in `map` becomes an object containing:
+ * - `value`: the original key (as a string, per `Object.entries`)
+ * - `label`: the value from `map`
+ * - `abbr`: the corresponding abbreviation from `abbr`
+ *
+ * @typeParam T - A record with numeric keys and string values.
+ * @typeParam A - A record whose keys match `T` and values are abbreviations.
+ * @param map - Source record mapping numeric keys to display labels.
+ * @param abbr - Record mapping the same keys to abbreviations.
+ * @returns An array of option objects with `value`, `label`, and `abbr`.
+ *
+ * @example
+ * ```ts
+ * const statusMap = {
+ *   1: 'Active',
+ *   2: 'Inactive',
+ * } as const;
+ *
+ * const statusAbbr = {
+ *   1: 'A',
+ *   2: 'I',
+ * } as const;
+ *
+ * const options = mapToOptionsWithAbbr(statusMap, statusAbbr);
+ * // [
+ * //   { value: '1', label: 'Active', abbr: 'A' },
+ * //   { value: '2', label: 'Inactive', abbr: 'I' }
+ * // ]
+ * ```
+ */
+export function mapToOptionsWithAbbr<
+  T extends Record<number, string>,
+  A extends { [K in keyof T]: string }
+>(map: T, abbr: A) {
+  return Object.entries(map).map(([key, label]) => ({
+    value: key,
+    label,
+    abbr: abbr[key as keyof T],
+  }));
+}
+
+/**
  * A wrapper around the native `fetch` API that automatically prepends the BASE_URL.
  * Designed for internal API calls only.
  *
@@ -62,6 +107,78 @@ export async function apiFetch(
 ): Promise<Response> {
   const url = `${BASE_URL.replace(/\/+$/, "")}/${endpoint.replace(/^\/+/, "")}`;
   return fetch(url, options);
+}
+
+/**
+ * Fetches data using the existing `apiFetch` function and ensures
+ * a minimum response time by delaying the returned response.
+ *
+ * The network request is NOT delayed. The delay only affects
+ * when the resolved `Response` is returned.
+ *
+ * @param endpoint - API endpoint path (relative to BASE_URL)
+ * @param options - Optional fetch configuration (same as native fetch)
+ * @param delay - Minimum delay in milliseconds before returning the response (default: 300ms)
+ * @returns A Promise that resolves to the Fetch API `Response`
+ *
+ * @example
+ * // Default 300ms minimum delay
+ * const res = await apiFetchDelay("users");
+ *
+ * @example
+ * // Custom delay
+ * const res = await apiFetchDelay("users", { method: "POST" }, 500);
+ */
+export async function apiFetchDelay(
+  endpoint: string,
+  options?: RequestInit,
+  delay: number = 300
+): Promise<Response> {
+  const responsePromise = apiFetch(endpoint, options);
+
+  const [response] = await Promise.all([
+    responsePromise,
+    new Promise<void>((resolve) => setTimeout(resolve, delay)),
+  ]);
+
+  return response;
+}
+
+/**
+ * Dynamically imports a Svelte component and ensures a minimum delay
+ * before returning the resolved component.
+ *
+ * The import starts immediately. The delay does NOT postpone the import itself —
+ * it only guarantees that the returned component is resolved after at least
+ * the specified delay duration.
+ *
+ * @typeParam T - A module type containing a default export of a Svelte Component
+ * @param importer - A function that returns a dynamic import of a Svelte component
+ * @param delay - Minimum delay in milliseconds before resolving (default: 150ms)
+ * @returns A Promise that resolves to the imported Svelte Component
+ *
+ * @example
+ * const Content = await delayComponentImport(
+ *   () => import("./content.svelte")
+ * );
+ *
+ * @example
+ * const Content = await delayComponentImport(
+ *   () => import("./content.svelte"),
+ *   300
+ * );
+ */
+export async function delayComponentImport<
+  T extends { default: Component<any> }
+>(importer: () => Promise<T>, delay: number = 150): Promise<T["default"]> {
+  const importPromise = importer();
+
+  const [module] = await Promise.all([
+    importPromise,
+    new Promise<void>((resolve) => setTimeout(resolve, delay)),
+  ]);
+
+  return module.default;
 }
 
 /**
@@ -248,6 +365,50 @@ export function randomIndex<T>(source: readonly T[] | number): number {
 
   return Math.floor(Math.random() * length);
 }
+
+
+/**
+ * Focuses the first matching element based on a CSS selector.
+ *
+ * Optionally scopes the search to a specific root element,
+ * which can be either a ParentNode or a selector string.
+ *
+ * @template T - The expected HTMLElement type.
+ * @param selector - CSS selector used to find the target element.
+ * @param root - Optional root scope. Can be a ParentNode or a selector string.
+ *                Defaults to `document` if not provided.
+ * @returns The focused element if found, otherwise `null`.
+ *
+ * @example
+ * // Focus globally
+ * focusElement<HTMLInputElement>("#email");
+ *
+ * @example
+ * // Focus inside a specific element
+ * focusElement<HTMLInputElement>("#email", formElement);
+ *
+ * @example
+ * // Focus inside a scoped selector
+ * focusElement<HTMLInputElement>("#email", "#login-form");
+ */
+export function focusElement<T extends HTMLElement = HTMLElement>(
+  selector: string,
+  root?: ParentNode | string
+): T | null {
+  const resolvedRoot: ParentNode | null =
+    typeof root === "string"
+      ? document.querySelector(root)
+      : root ?? document;
+
+  if (!resolvedRoot) return null;
+
+  const element = resolvedRoot.querySelector<T>(selector);
+  if (!element) return null;
+
+  element.focus();
+  return element;
+}
+
 
 export * from "./form-normalizer";
 export * from "./name-formatter";

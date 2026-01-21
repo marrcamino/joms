@@ -80,7 +80,7 @@
       extension = employee.extension ?? "";
       email = employee.email ?? "";
       address = employee.address ?? "";
-      sexValue = employee.sex;
+      sexValue = employee.sex?.toString() ?? "";
       if (employee.birthday) {
         birthday = cDate.toDateValue(employee.birthday);
       }

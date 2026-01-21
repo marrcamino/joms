@@ -37,7 +37,7 @@
       );
 
       if (!res.ok) {
-        toast.error("Unable to remove employee", {
+        toast.error("Unable to remove entry", {
           description: "Please try again",
         });
         return;
@@ -58,14 +58,14 @@
   <AlertDialog.Content mode={onlyOneLeft ? "danger" : "default"}>
     <AlertDialog.Header>
       <AlertDialog.Title>
-        {onlyOneLeft ? "Cannot Remove Employee" : "Remove Employee"}
+        {onlyOneLeft ? "Cannot Remove Entry" : "Remove Entry"}
       </AlertDialog.Title>
       <AlertDialog.Description class="">
         {#if onlyOneLeft}
-          A transmittal requires at least one employee. Add another employee
+          A transmittal requires at least one entry. Add another entry
           first, then you can remove this one.
         {:else}
-          This action cannot be undone. This will permanently delete employee
+          This action cannot be undone. This will permanently delete entry
           from transmittal.
         {/if}
       </AlertDialog.Description>

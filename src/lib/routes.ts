@@ -1,22 +1,21 @@
-import Home from "$routes/home.svelte";
-import OfficeRoute from "$routes/offices/index.svelte";
 import NewEmployee from "$routes/employees/new/index.svelte";
-import Test from "$routes/test/index.svelte";
+import Home from "$routes/home.svelte";
+import Test from "$routes/index.svelte";
+import OfficeRoute from "$routes/offices/index.svelte";
 import {
-  House,
-  Users,
   Building,
+  House,
   TestTubeDiagonal,
+  Users,
   type IconProps,
 } from "@lucide/svelte/icons";
 import { type Component } from "svelte";
+import { type WrappedComponent as OldWrappedComponent } from "svelte-spa-router";
 import {
   wrap as oldWrap,
   type WrapOptions as OldWrapOptions,
 } from "svelte-spa-router/wrap";
-import { type WrappedComponent as OldWrappedComponent } from "svelte-spa-router";
 import NotFound from "./components/not-found.svelte";
-import OfficeView from "$routes/offices/[office_id]/index.svelte";
 
 // route type
 type ROUTES_MAP = VisibleInNavigation | HiddenInNavigation;

@@ -18,10 +18,10 @@
         {/each}
       </div>
     </Empty.Media>
-    <Empty.Title>No employees added yet</Empty.Title>
-    <Empty.Description
-      >Add at least one employee to save this transmittal</Empty.Description
-    >
+    <Empty.Title>No entries yet</Empty.Title>
+    <Empty.Description>
+      Add at least one entry to save this transmittal
+    </Empty.Description>
   </Empty.Header>
   <Empty.Content class="gap-1">
     <Button
@@ -31,7 +31,7 @@
         drftTransCtx.addEmpDialogState = true;
       }}
     >
-      Add Employee
+      Add Entry
     </Button>
     <div class="text-muted-foreground">&ndash; or &ndash;</div>
     <Button
