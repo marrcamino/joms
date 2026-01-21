@@ -5,7 +5,7 @@
   import {
     getEmployeeContext,
     getSideSheetContentContext,
-  } from "../context.svelte";
+  } from "../../context.svelte";
   import { updateContractStatus } from "./activate-contract-alert-dialog.svelte";
 
   interface Props {

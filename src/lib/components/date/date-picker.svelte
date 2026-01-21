@@ -134,7 +134,7 @@
         variant: "outline",
         class: [
           "justify-start w-full min-w-[40px] text-left font-normal relative ",
-          "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive aria-invalid:ring-[3px]",
+          "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive aria-invalid:ring-[3px] hover:group-data-present/date:text-transparent group-data-present/date:text-transparent",
           triggerOptions?.class ?? null,
         ],
       }),
@@ -173,6 +173,7 @@
   </Popover.Trigger>
 
   <Popover.Content bind:ref={contentRef} class="w-auto p-0">
+    <!-- <div class="text-right pt-2 pr-2"><Button variant="outline" size="sm">To present</Button></div> -->
     <Calendar
       onValueChange={(value) => {
         onValueChange?.(value);
@@ -180,7 +181,7 @@
       }}
       {disabled}
       type="single"
-      class="rounded-md border shadow-sm"
+      class="rounded-md border shadow-sm border-t-0 rounded-t-none"
       bind:value
       bind:placeholder
       maxValue={maxDate}

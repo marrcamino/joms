@@ -4,7 +4,6 @@ require_once __DIR__ . '/../../helpers.php';
 try {
   $db = getDatabase();
 
-  // Validate employee_id
   if (is_missing($_GET, 'employee_pk')) {
     http_response_code(400);
     echo json_encode(['status' => 'error', 'message' => 'Missing employee_pk']);

@@ -58,17 +58,18 @@
   import AnimateContent from "$lib/components/animate-content.svelte";
   import DateDisplay from "$lib/components/display/date-display.svelte";
   import * as Alert from "$lib/components/ui/alert/index.js";
+  import { Button } from "$lib/components/ui/button";
   import Checkbox from "$lib/components/ui/checkbox/checkbox.svelte";
   import Label from "$lib/components/ui/label/label.svelte";
   import { ScrollArea } from "$lib/components/ui/scroll-area/index.js";
+  import Skeleton from "$lib/components/ui/skeleton/skeleton.svelte";
   import type { TransmittalContractItems } from "$lib/types";
-  import { apiFetch, formatFullName } from "$lib/utils";
-  import { CalendarRange, CircleAlert, Landmark, Info } from "@lucide/svelte";
+  import { apiFetch, formatFullName, randomIndex } from "$lib/utils";
+  import { CalendarRange, CircleAlert, Info, Landmark } from "@lucide/svelte";
   import { onMount, untrack } from "svelte";
   import { quartIn } from "svelte/easing";
   import { SvelteSet } from "svelte/reactivity";
   import { slide } from "svelte/transition";
-  import { Button } from "$lib/components/ui/button";
 
   const WIDTHS = [100, 130, 150, 180, 200];
   const pickEmpsContext = getPickEmpContext();
@@ -141,8 +142,9 @@
       </div>
     </div>
   </div>
+
   <ScrollArea viewPortClasses="max-h-[200px]" type="always">
-    <div class="space-y-1 py-1">
+    <div class="py-1">
       <div class="flex items-center gap-2 pl-1">
         <Checkbox
           id="e_all"
@@ -161,38 +163,57 @@
             : "S"}elect All</Label
         >
       </div>
-      {#if pickEmpsContext.emps.length}
-        <div
-          in:slide={{ easing: quartIn, delay: 500 }}
-          data-invalid={!pickEmpsContext.ids.size ? "" : null}
-          class="group"
-        >
-          {#each pickEmpsContext.emps as contract (contract.employee_pk)}
-            <div class="flex items-center gap-2 py-0.5 pl-1">
-              <Checkbox
-                class="group-data-invalid:ring-destructive/40 group-data-invalid:border-destructive group-data-invalid:dark:aria-invalid:ring-destructive/40"
-                id="e_{contract.employee_pk}"
-                checked={pickEmpsContext.ids.has(contract.employee_pk)}
-                onCheckedChange={(v) => {
-                  if (v) {
-                    pickEmpsContext.ids.add(contract.employee_pk);
-                    return;
-                  }
-                  pickEmpsContext.ids.delete(contract.employee_pk);
-                }}
-              />
-              <Label for="e_{contract.employee_pk}" class="font-normal">
-                {formatFullName({ ...contract })}</Label
+
+      <div style="min-height: 66px;">
+        {#if pickEmpsContext.emps.length}
+          <div
+            in:slide={{ easing: quartIn }}
+            data-invalid={!pickEmpsContext.ids.size ? "" : null}
+            class="group"
+          >
+            {#each pickEmpsContext.emps as contract (contract.employee_pk)}
+              <div class="flex items-center gap-2 py-0.5 pl-1">
+                <Checkbox
+                  class="group-data-invalid:ring-destructive/40 transition-colors group-data-invalid:border-destructive group-data-invalid:dark:aria-invalid:ring-destructive/40"
+                  id="e_{contract.employee_pk}"
+                  checked={pickEmpsContext.ids.has(contract.employee_pk)}
+                  onCheckedChange={(v) => {
+                    if (v) {
+                      pickEmpsContext.ids.add(contract.employee_pk);
+                      return;
+                    }
+                    pickEmpsContext.ids.delete(contract.employee_pk);
+                  }}
+                />
+                <Label for="e_{contract.employee_pk}" class="font-normal">
+                  {formatFullName({ ...contract })}</Label
+                >
+              </div>
+            {/each}
+
+            <!-- <div class="text-muted-foreground text-xs pl-1">
+              Selected {pickEmpsContext.ids.size}
+            </div> -->
+          </div>
+        {:else}
+          <div out:slide={{ easing: quartIn }}>
+            {#each Array.from({ length: 3 }) as _}
+              <div
+                class="flex items-center gap-1 py-0.5"
+                style="padding-left: 3px;"
               >
-            </div>
-          {/each}
-        </div>
-      {/if}
+                <Skeleton class="size-4.5 rounded" />
+                <Skeleton
+                  class="h-4.5 rounded"
+                  style="width: {WIDTHS[randomIndex(WIDTHS)]}px"
+                />
+              </div>
+            {/each}
+          </div>
+        {/if}
+      </div>
     </div>
   </ScrollArea>
-  <div class="text-muted-foreground text-xs pl-1">
-    Selected {pickEmpsContext.ids.size}
-  </div>
 
   <div class="px-0.5">
     {#if !pickEmpsContext.ids.size}
@@ -208,13 +229,13 @@
       </AnimateContent>
     {/if}
 
-    <Alert.Root variant="info" class="mt-1" hidden>
+    <!--  <Alert.Root variant="info" class="mt-1" hidden>
       <Info />
       <Alert.Title class="font-normal">
         <span class="font-semibold">Note:</span> You can add another employee
         later
         <Button class="float-end" size="xs" variant="outline">Close</Button>
       </Alert.Title>
-    </Alert.Root>
+    </Alert.Root>-->
   </div>
 </div>

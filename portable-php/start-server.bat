@@ -1,5 +1,5 @@
 @echo off
 cd /d %~dp0
 echo Starting PHP server on http://localhost:8080 ...
-php -S localhost:8080 -t htdocs -c php.ini index.php
+"%~dp0php.exe" -S localhost:8080 -t "%~dp0htdocs" -c "%~dp0php.ini" index.php
 pause

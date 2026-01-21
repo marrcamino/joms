@@ -32,11 +32,11 @@
   </div>
 </RouteContent>
 
-{#await import("./components/edit-employee-dialog.svelte") then { default: EditEmployeeDialog }}
+{#await import("./components/dialogs/edit-employee-dialog.svelte") then { default: EditEmployeeDialog }}
   <EditEmployeeDialog bind:open={sheetContext.editEmployeeState} />
 {/await}
 
-{#await import("./components/delete-employee-alert-dialog.svelte") then { default: DeleteEmployeeAlertDialog }}
+{#await import("./components/dialogs/delete-employee-alert-dialog.svelte") then { default: DeleteEmployeeAlertDialog }}
   <DeleteEmployeeAlertDialog
     bind:open={sheetContext.deleteEmployeeAlertDialogState}
   />

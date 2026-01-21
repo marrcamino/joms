@@ -2,15 +2,38 @@
 setlocal enabledelayedexpansion
 title Portable PHP Environment Setup
 
-REM ============================================================
-REM  Portable PHP Environment Installer
-REM  - Downloads and configures PHP 8.3 (x64)
-REM  - Creates a portable web server setup with SQLite support
-REM ============================================================
+echo Checking for required Visual C++ runtime (x64)...
+
+for /f "tokens=3" %%M in ('reg query "HKLM\SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\x64" /v Major 2^>nul') do set VC_MAJOR=%%M
+for /f "tokens=3" %%M in ('reg query "HKLM\SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\x64" /v Minor 2^>nul') do set VC_MINOR=%%M
+
+if not defined VC_MAJOR (
+    echo [ERROR] Visual C++ Runtime not found
+    pause
+    exit /b 1
+)
+
+echo Found VC runtime: %VC_MAJOR%.%VC_MINOR%
+
+REM Require >= 14.44
+if %VC_MAJOR% LSS 14 (
+    echo [ERROR] VC runtime too old
+    pause
+    exit /b 1
+)
+
+if %VC_MAJOR% EQU 14 if %VC_MINOR% LSS 44 (
+    echo [ERROR] VC runtime too old
+    pause
+    exit /b 1
+)
+
+echo Visual C++ runtime check passed!
+
 
 set PHP_VERSION=8.4.13
 set PHP_ZIP=php-%PHP_VERSION%-nts-Win32-vs17-x64.zip
-set PHP_URL=https://windows.php.net/downloads/releases/%PHP_ZIP%
+set PHP_URL=https://downloads.php.net/~windows/releases/archives/%PHP_ZIP%
 set TARGET_DIR=portable-php
 
 REM === COLORS ===
@@ -22,7 +45,7 @@ set "COL_RESET=[0m"
 
 echo.
 echo %COL_YELLOW%=== Checking Internet Connection... ===%COL_RESET%
-ping -n 1 windows.php.net >nul 2>&1
+ping -n 1 github.com >nul 2>&1
 if errorlevel 1 (
     echo %COL_RED%[ERROR] No internet connection detected.%COL_RESET%
     pause
@@ -64,7 +87,7 @@ echo.
 echo %COL_YELLOW%Creating php.ini configuration...%COL_RESET%
 (
     echo [PHP]
-    echo extension_dir=ext
+    echo extension_dir=%CD%\%TARGET_DIR%\ext
     echo extension=pdo_sqlite
     echo extension=sqlite3
     echo display_errors=On
@@ -78,7 +101,7 @@ echo %COL_YELLOW%Creating start-server.bat...%COL_RESET%
     echo @echo off
     echo cd /d %%~dp0
     echo echo Starting PHP server on http://localhost:8080 ...
-    echo php -S localhost:8080 -t htdocs -c php.ini
+    echo "%%~dp0php.exe" -S localhost:8080 -t "%%~dp0htdocs" -c "%%~dp0php.ini"
     echo pause
 ) > "%TARGET_DIR%\start-server.bat"
 

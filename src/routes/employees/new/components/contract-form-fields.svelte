@@ -174,7 +174,6 @@
             <Label class="flex flex-col gap-1 items-start">
               <div>
                 <span>Select Position Category</span>
-                {@render requiredAsterisk()}
               </div>
               <PositionCategorySelector name="positionCategoryFk" {width} />
             </Label>

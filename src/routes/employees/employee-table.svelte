@@ -13,7 +13,7 @@
     type VisibilityState,
   } from "@tanstack/table-core";
   import NewAdded from "./components/new-added.svelte";
-  import TableEmptyData from "./components/table-empty-data.svelte";
+  import TableEmptyData from "./components/table/table-empty-data.svelte";
   import { getEmployeeContext } from "./context.svelte";
   import { columns } from "./table-schema";
 

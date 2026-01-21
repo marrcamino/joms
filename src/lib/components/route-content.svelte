@@ -41,6 +41,7 @@
 
 <div class="relative flex flex-1 flex-col gap-4" data-layout-content>
   <div class="flex-1">
+    <!-- {@render children()} -->
     {#if noScrollArea}
       <div class="min-h-[calc(100vh-3rem)]">
         {@render children()}

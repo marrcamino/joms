@@ -7,8 +7,8 @@
   import {
     getEmployeeContext,
     getSideSheetContentContext,
-  } from "../context.svelte";
-  import ContractFormFields from "../new/components/contract-form-fields.svelte";
+  } from "../../context.svelte";
+  import ContractFormFields from "../../new/components/contract-form-fields.svelte";
 
   interface Props {
     open?: boolean;

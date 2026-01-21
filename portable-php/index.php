@@ -40,6 +40,7 @@ $routes = [
     '/api/employee/search' => 'htdocs/api/employee/search.php',
     '/api/employee/contract' => 'htdocs/api/employee/contract/get.php',
     '/api/employee/contract/latest' => 'htdocs/api/employee/contract/latest.php',
+    '/api/employee/contract/check-pds-present' => 'htdocs/api/employee/contract/check-pds-present.php',
     '/api/office' => 'htdocs/api/office/get.php',
     '/api/office/transmittal' => 'htdocs/api/office/transmittal/get.php',
     '/api/transmittal' => 'htdocs/api/transmittal/get.php',

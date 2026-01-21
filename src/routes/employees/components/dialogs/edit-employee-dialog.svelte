@@ -1,14 +1,13 @@
 <script lang="ts">
   import { Button, buttonVariants } from "$lib/components/ui/button/index.js";
   import * as Dialog from "$lib/components/ui/dialog/index.js";
-  import { ScrollArea } from "$lib/components/ui/scroll-area/index.js";
   import Spinner from "$lib/components/ui/spinner/spinner.svelte";
   import { apiFetch, normalizeFormData } from "$lib/utils";
   import { toast } from "svelte-sonner";
-  import { getEmployeeContext } from "../context.svelte";
+  import { getEmployeeContext } from "../../context.svelte";
   import BasicInformation, {
     type BasicInformationObjectFormData,
-  } from "../new/components/basic-information.svelte";
+  } from "../../new/components/basic-information.svelte";
 
   interface Props {
     open?: boolean;
@@ -81,20 +80,13 @@
         </Dialog.Description>
       </Dialog.Header>
 
-      <ScrollArea
-        style="height: 450px;"
-        scrollbarYClasses="*:data-[scroll-area-thumb]:bg-muted-foreground/50"
-        class="px-4"
-        type="always"
-      >
-        <div class="px-2 pb-4">
-          <BasicInformation
-            asContent
-            employee={context.openEmployee}
-            bind:hasDuplicate
-          />
-        </div>
-      </ScrollArea>
+      <div class="px-6 pb-4">
+        <BasicInformation
+          asContent
+          employee={context.openEmployee}
+          bind:hasDuplicate
+        />
+      </div>
       <Dialog.Footer class="px-6 pt-4">
         <Dialog.Close
           disabled={isUpdating}

@@ -2,14 +2,21 @@ import type { TransmittalContractItems } from "$lib/types";
 import { getContext, setContext } from "svelte";
 
 const OFFICE_TRANSMITTAL_CONTEXT = Symbol("officeTransmittalContext");
-type PartialExceptPK = { transmittal_pk: number } & Partial<
-  Omit<TransmittalContractItems, "transmittal_item_pk">
->;
 
 function createOfficeTransmittalContext() {
   let items: TransmittalContractItems[] = $state([]);
   let openItem: TransmittalContractItems | null = $state(null);
   let deleteDialogState = $state(false);
+
+  function add(emp: TransmittalContractItems) {
+    const ladtTrans = [...$state.snapshot(items), emp];
+    items = sortByLastname(ladtTrans);
+    return getLatestDetails();
+  }
+
+  function removeItem(id: number) {
+    items = items.filter((i) => i.transmittal_item_pk !== id);
+  }
 
   function getLatestDetails() {
     const getDateRange = () => {
@@ -51,30 +58,9 @@ function createOfficeTransmittalContext() {
     };
   }
 
-  function add(emp: TransmittalContractItems) {
-    let ladtTrans = $state.snapshot(items);
-    ladtTrans.push(emp);
-
-    items = sortByLastname(ladtTrans);
-
-    return getLatestDetails();
-  }
-
-  function removeItem(id: number) {
-    items = items.filter((i) => i.transmittal_item_pk !== id);
-  }
-
   function openDeleteDialog(item: TransmittalContractItems) {
     openItem = item;
     deleteDialogState = true;
-  }
-
-  function sortByLastname(theItems: TransmittalContractItems[], desc = false) {
-    return theItems.sort((a, b) => {
-      const aLast = (a.lastname ?? "").trim().toLowerCase();
-      const bLast = (b.lastname ?? "").trim().toLowerCase();
-      return desc ? bLast.localeCompare(aLast) : aLast.localeCompare(bLast);
-    });
   }
 
   function updateTransmittalInfo(item: TransmittalContractItems) {
@@ -86,8 +72,14 @@ function createOfficeTransmittalContext() {
     return getLatestDetails();
   }
 
-  // attach helper to the array so callers can do: ctx.items.sortByLastname()
-  (items as unknown as Record<string, unknown>).sortByLastname = sortByLastname;
+  function sortByLastname(theItems: TransmittalContractItems[], desc = false) {
+    return [...theItems].sort((a, b) => {
+      const aLast = (a.lastname ?? "").trim().toLowerCase();
+      const bLast = (b.lastname ?? "").trim().toLowerCase();
+      return desc ? bLast.localeCompare(aLast) : aLast.localeCompare(bLast);
+    });
+  }
+
   return {
     get openItem() {
       return openItem;
