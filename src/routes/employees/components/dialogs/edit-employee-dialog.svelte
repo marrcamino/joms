@@ -7,7 +7,7 @@
   import { getEmployeeContext } from "../../context.svelte";
   import BasicInformation, {
     type BasicInformationObjectFormData,
-  } from "../../new/components/basic-information.svelte";
+  } from "$lib/components/emp-basic-info.svelte";
 
   interface Props {
     open?: boolean;
@@ -26,7 +26,7 @@
 
       e.preventDefault();
       const formData = normalizeFormData(
-        e.target as HTMLFormElement
+        e.target as HTMLFormElement,
       ) as BasicInformationObjectFormData;
 
       if (!context.openEmployee) return;
@@ -38,7 +38,7 @@
         {
           method: "PATCH",
           body: JSON.stringify(formData),
-        }
+        },
       );
 
       if (!res.ok) {

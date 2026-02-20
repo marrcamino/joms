@@ -88,7 +88,7 @@
   });
 
   const triggerContent = $derived(
-    sexList.find((f) => f.value === sexValue)?.label ?? "Select Sex"
+    sexList.find((f) => f.value === sexValue)?.label ?? "Select Sex",
   );
 
   const runCheck = useDebounce(
@@ -117,7 +117,7 @@
         } else hasDuplicate = data.duplicate;
       });
     },
-    () => 500
+    () => 500,
   );
 
   function hideTipForever() {
@@ -184,6 +184,7 @@
           name="lname"
           bind:value={lname}
           aria-invalid={hasDuplicate}
+          type="text"
         />
       </div>
       <div>
@@ -194,6 +195,8 @@
           name="fname"
           bind:value={fname}
           aria-invalid={hasDuplicate}
+          autocomplete="off"
+          type="text"
         />
       </div>
       <div>
@@ -203,6 +206,8 @@
           name="mname"
           bind:value={mname}
           aria-invalid={hasDuplicate}
+          autocomplete="off"
+          type="text"
         />
       </div>
       <div>
@@ -213,6 +218,7 @@
             name="extension"
             bind:value={extension}
             aria-invalid={hasDuplicate}
+            autocomplete="off"
           />
         </div>
 
@@ -355,7 +361,13 @@
 
     <div>
       <Label for="email">Email</Label>
-      <Input id="email" name="email" type="email" bind:value={email} />
+      <Input
+        id="email"
+        name="email"
+        type="email"
+        bind:value={email}
+        autocomplete="off"
+      />
     </div>
 
     <div>
@@ -365,6 +377,7 @@
         autoHeight
         id="address"
         name="address"
+        autocomplete="off"
         bind:value={address}
       />
     </div>

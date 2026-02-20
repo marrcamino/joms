@@ -3,7 +3,7 @@
   import { Spinner } from "$lib/components/ui/spinner/index.js";
   import { Save } from "@lucide/svelte";
   import { untrack } from "svelte";
-  import BasicInformation from "./basic-information.svelte";
+  import BasicInformation from "$lib/components/emp-basic-info.svelte";
   import ContractFormFields from "./contract-form-fields.svelte";
 
   let isSaving = $state(false);

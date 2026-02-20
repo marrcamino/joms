@@ -65,7 +65,7 @@
 </Content>
 
 {#snippet loading()}
-  <div class="size-full flex h-[400px]">
+  <div class="size-full flex min-h-[400px] h-full">
     <Spinner class="m-auto" />
   </div>
 {/snippet}
